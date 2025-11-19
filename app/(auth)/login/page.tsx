@@ -12,15 +12,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { useLogin } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { mutate: login, isPending, error } = useLogin();
+  const router = useRouter();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login logic
-    console.log("Login:", { email, password });
+
+    login(
+      { email, password },
+      {
+        onSuccess: () => {
+          router.push("/home");
+        },
+        onError: () => {
+          toast.error("Invalid email or password");
+        },
+      }
+    );
   };
 
   return (

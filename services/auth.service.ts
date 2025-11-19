@@ -11,18 +11,18 @@ export type UserResponse = {
 };
 
 export const AuthService = {
-  async loginWithIsdToken(idToken: string) {
-    const response = await api.post("/auth/login", { idToken });
+  async login(email: string, password: string) {
+    const response = await api.post("/api/auth/login", { email, password });
     return response.data;
   },
 
   async LogOut() {
-    const response = await api.post("/auth/logout");
+    const response = await api.post("/api/auth/logout");
     return response.data;
   },
 
   async getUserMe(): Promise<UserResponse> {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/api/auth/me");
     return response.data;
   },
 

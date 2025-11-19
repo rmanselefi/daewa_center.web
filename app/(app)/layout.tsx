@@ -1,4 +1,5 @@
 "use client";
+import { PlayerBar } from "@/components/common/PlayerBar";
 import { Sidebar } from "@/components/common/Sidebar";
 import { useIsMobile } from "@/hooks/useMobile";
 
@@ -12,6 +13,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      <PlayerBar />
     </div>
   );
 }

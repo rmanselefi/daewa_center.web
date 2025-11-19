@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { AuthService } from "@/services/auth.service";
 
@@ -15,13 +14,8 @@ export function useLogin() {
       email: string;
       password: string;
     }) => {
-      const credentials = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const idToken = await credentials.user.getIdToken();
-      await AuthService.loginWithIsdToken(idToken);
+      const response = await AuthService.login(email, password);
+      return response;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["user"] });
@@ -37,7 +31,6 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       await AuthService.LogOut();
-      await signOut(auth);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["user"] });

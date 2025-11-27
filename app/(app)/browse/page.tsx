@@ -19,6 +19,8 @@ export interface Playlist {
   count: number;
 }
 
+import LoginBanner from "@/components/common/LoginBanner";
+
 export default function Browse() {
   const router = useRouter();
   const [playlists, setPlaylists] = useState<Playlist[]>([
@@ -88,6 +90,7 @@ export default function Browse() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <LoginBanner />
       <h1 className="text-3xl font-bold mb-8">Browse Content</h1>
 
       {/* Filters */}

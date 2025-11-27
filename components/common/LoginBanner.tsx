@@ -11,7 +11,7 @@ export default function LoginBanner() {
   if (isLoading || user) return null;
 
   return (
-    <Alert className="rounded-none border-x-0 border-t-0 bg-primary/10 border-primary/20">
+    <Alert className="rounded-none border-x-0 border-t-0 bg-primary/10 border-primary/20 items-center">
       <LogIn className="h-4 w-4" />
       <AlertDescription className="flex items-center justify-between">
         <span>

@@ -7,6 +7,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Playlist } from "../browse/page";
 
+import LoginBanner from "@/components/common/LoginBanner";
+
 export default function Search() {
   const router = useRouter();
   const [playlists, setPlaylists] = useState<Playlist[]>([
@@ -47,6 +49,7 @@ export default function Search() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <LoginBanner />
       <h1 className="text-3xl font-bold mb-8">Search</h1>
 
       {/* Search Bar */}

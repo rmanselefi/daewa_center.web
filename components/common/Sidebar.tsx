@@ -4,14 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+import { useUser } from "@/hooks/useUser";
+
 export const Sidebar = () => {
+  const { data: user } = useUser();
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
+    { icon: Home, label: "Home", path: "/home" },
     { icon: Compass, label: "Browse", path: "/browse" },
     { icon: Search, label: "Search", path: "/search" },
-    { icon: BookOpen, label: "Library", path: "/library" },
-    { icon: User, label: "Profile", path: "/profile" },
-  ];
+    { icon: BookOpen, label: "Library", path: "/library", protected: true },
+    { icon: User, label: "Profile", path: "/profile", protected: true },
+  ].filter((item) => !item.protected || user);
 
   const pathname = usePathname();
   const isActive = (path: string) => pathname === path;

@@ -1,9 +1,23 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Settings, Bell, Download, HelpCircle, LogOut } from "lucide-react";
+import { useUser } from "@/hooks/useUser";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Profile() {
+  const router = useRouter();
+  const { data: user, isLoading } = useUser();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) return null;
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8">Profile</h1>
@@ -12,7 +26,9 @@ export default function Profile() {
       <Card className="p-6 mb-8">
         <div className="flex items-center gap-4 mb-6">
           <Avatar className="w-20 h-20">
-            <AvatarFallback className="text-2xl bg-primary text-primary-foreground">AK</AvatarFallback>
+            <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
+              AK
+            </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">Ahmad Khalil</h2>
@@ -59,7 +75,10 @@ export default function Profile() {
           <HelpCircle className="w-5 h-5" />
           <span>Help & Support</span>
         </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
+        >
           <LogOut className="w-5 h-5" />
           <span>Log Out</span>
         </Button>

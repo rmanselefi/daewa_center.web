@@ -87,6 +87,13 @@ const Login = () => {
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => router.push("/home")}
+          >
+            Continue as Guest
+          </Button>
           <div className="text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link

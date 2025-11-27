@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,20 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Playlist } from "../browse/page";
 
+import { useUser } from "@/hooks/useUser";
+import { useEffect } from "react";
+
 export default function Library() {
   const router = useRouter();
+  const { data: user, isLoading } = useUser();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) return null;
   const [playlists, setPlaylists] = useState<Playlist[]>([
     { id: "p1", title: "Morning Reminders", count: 12 },
     { id: "p2", title: "Tafsir Series", count: 30 },

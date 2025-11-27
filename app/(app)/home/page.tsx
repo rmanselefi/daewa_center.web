@@ -2,23 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-export interface Playlist {
-  id: string;
-  title: string;
-  count: number;
-}
-
+import LoginBanner from "@/components/common/LoginBanner";
 export default function Home() {
   const router = useRouter();
-  const [playlists, setPlaylists] = useState<Playlist[]>([
-    { id: "p1", title: "Morning Reminders", count: 12 },
-    { id: "p2", title: "Tafsir Series", count: 30 },
-    { id: "p3", title: "Character Development", count: 15 },
-  ]);
-
   const featured = [
     {
       id: 1,
@@ -84,6 +71,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
+      {/* Guest Access Banner */}
+      <LoginBanner />
+
       {/* Hero Section */}
       <section className="relative h-[400px] bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(45,212,191,0.1),transparent_50%)]" />
@@ -92,7 +82,7 @@ export default function Home() {
             Welcome to Daewa Zone
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl">
-            Your gateway to authentic Islamic knowledge. Stream lectures, Quran
+            Your gateway to authentic Islamic knowledge. Stream lectures, Qur'an
             recitations, and spiritual guidance.
           </p>
           <Button size="lg" className="bg-primary hover:bg-primary/90">
@@ -117,13 +107,6 @@ export default function Home() {
               speaker={item.speaker}
               duration={item.duration}
               onClick={() => router.push(`/content/${item.id}`)}
-              onAddToPlaylist={(playlistId) =>
-                setPlaylists([
-                  ...playlists,
-                  { id: playlistId, title: playlistId, count: 0 },
-                ])
-              }
-              playlists={playlists}
             />
           ))}
         </div>
@@ -145,13 +128,6 @@ export default function Home() {
               speaker={item.speaker}
               duration={item.duration}
               onClick={() => router.push(`/content/${item.id}`)}
-              onAddToPlaylist={(playlistId) =>
-                setPlaylists([
-                  ...playlists,
-                  { id: playlistId, title: playlistId, count: 0 },
-                ])
-              }
-              playlists={playlists}
             />
           ))}
         </div>

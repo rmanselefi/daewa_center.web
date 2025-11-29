@@ -24,7 +24,6 @@ const Login = () => {
   const router = useRouter();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
     login(
       { email, password },
       {

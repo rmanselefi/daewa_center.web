@@ -7,6 +7,7 @@ import { useUser } from "@/hooks/useUser";
 export default function LoginBanner() {
   const router = useRouter();
   const { data: user, isLoading } = useUser();
+  console.log("banner", user);
 
   if (isLoading || user) return null;
 

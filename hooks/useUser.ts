@@ -3,7 +3,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { AuthService } from "@/services/auth.service";
+import { AuthService, CreateUserReq } from "@/services/auth.service";
+import { toast } from "sonner";
+
+export const USER_KEYS = {
+  all: ["users"] as const,
+  lists: () => [...USER_KEYS.all, "list"] as const,
+  list: (filters: string) => [...USER_KEYS.lists(), { filters }] as const,
+  details: () => [...USER_KEYS.all, "detail"] as const,
+  detail: (id: string) => [...USER_KEYS.details(), id] as const,
+};
 
 export function useLogin() {
   const qc = useQueryClient();
@@ -15,11 +24,12 @@ export function useLogin() {
       email: string;
       password: string;
     }) => {
+      console.log(password);
       const response = await AuthService.login(email, password);
       return response;
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["user"] });
+      qc.invalidateQueries({ queryKey: USER_KEYS.detail("me") });
     },
     onError: (error) => {
       console.error(error);
@@ -35,7 +45,7 @@ export function useLogout() {
       await AuthService.LogOut();
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["user"] });
+      qc.invalidateQueries({ queryKey: USER_KEYS.detail("me") });
       router.push("/login");
     },
     onError: (error) => {
@@ -46,11 +56,32 @@ export function useLogout() {
 
 export function useUser() {
   return useQuery({
-    queryKey: ["user"],
+    queryKey: USER_KEYS.detail("me"),
     queryFn: async () => {
-      const response = await AuthService.getUserMe();
-      return response.user;
+      try {
+        const response = await AuthService.getUserMe();
+        console.log("getUserMe response:", response);
+        return response || null;
+      } catch (error) {
+        console.error("getUserMe error:", error);
+        throw error;
+      }
     },
     retry: false,
+  });
+}
+
+export function useUserRegister() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateUserReq) => AuthService.createUser(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: USER_KEYS.lists() });
+      toast.success("User created successfully");
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to create user");
+    },
   });
 }

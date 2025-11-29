@@ -12,34 +12,42 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { useUserRegister } from "@/hooks/useUser";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const Signup = () => {
-  const [name, setName] = useState("");
+  const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const router = useRouter();
+
+  const { mutate: register, isPending, error } = useUserRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement signup logic
     if (password !== confirmPassword) {
-      console.error("Passwords don't match");
+      toast.error("Passwords don't match");
       return;
     }
 
-    try{
-        const credentials = await createUserWithEmailAndPassword(auth, email, password);    
-        if(name){
-            
-        }
-    }
-    catch(error){
-      console.error(error);
-    }
-
-    console.log("Signup:", { name, email, password });
+    register(
+      {
+        fullname,
+        email,
+        password,
+      },
+      {
+        onSuccess: () => {
+          toast.success("User created successfully");
+          router.push("/login");
+        },
+        onError: () => {
+          toast.error("Failed to create user");
+        },
+      }
+    );
   };
 
   return (
@@ -61,7 +69,7 @@ const Signup = () => {
                 id="name"
                 type="text"
                 placeholder="Your name"
-                value={name}
+                value={fullname}
                 onChange={(e) => setName(e.target.value)}
                 required
               />

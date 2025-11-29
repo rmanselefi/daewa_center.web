@@ -1,13 +1,17 @@
 import api from "@/lib/api";
 
 export type UserResponse = {
-  user?: {
-    id: string;
-    email?: string | null;
-    displayName?: string | null;
-    photoURL?: string | null;
-    profile?: Record<string, unknown> | null;
-  };
+  id: string;
+  email?: string | null;
+  fullname?: string | null;
+  photoURL?: string | null;
+  profile?: Record<string, unknown> | null;
+};
+
+export type CreateUserReq = {
+  email: string;
+  password: string;
+  fullname: string;
 };
 
 export const AuthService = {
@@ -26,8 +30,8 @@ export const AuthService = {
     return response.data;
   },
 
-  async registerWithEmailAndPassword(email: string, password: string) {
-    const response = await api.post("/auth/register", { email, password });
+  async createUser({ email, password, fullname }: CreateUserReq) {
+    const response = await api.post("/api/user", { email, password, fullname });
     return response.data;
   },
 };

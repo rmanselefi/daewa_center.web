@@ -15,6 +15,7 @@ import {
 import { useUserRegister } from "@/hooks/useUser";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useI18n } from "@/stores/useI18nStore";
 
 const Signup = () => {
   const [fullname, setName] = useState("");
@@ -22,13 +23,14 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
+  const { t } = useI18n();
 
   const { mutate: register, isPending, error } = useUserRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords don't match");
+      toast.error(t("passwordsDontMatch"));
       return;
     }
 
@@ -40,11 +42,11 @@ const Signup = () => {
       },
       {
         onSuccess: () => {
-          toast.success("User created successfully");
+          toast.success(t("userCreatedSuccess"));
           router.push("/login");
         },
         onError: () => {
-          toast.error("Failed to create user");
+          toast.error(t("failedToCreateUser"));
         },
       }
     );
@@ -58,35 +60,35 @@ const Signup = () => {
             Daewa Zone
           </CardTitle>
           <CardDescription>
-            Create an account to start listening
+            {t("createAccountToStart")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t("fullName")}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="Your name"
+                placeholder={t("yourName")}
                 value={fullname}
                 onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -97,7 +99,7 @@ const Signup = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t("confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -108,18 +110,18 @@ const Signup = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Create Account
+              {t("createAccount")}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Already have an account?{" "}
+            {t("alreadyHaveAccount")}{" "}
             <Link
               href="/login"
               className="text-primary hover:underline font-medium"
             >
-              Sign in
+              {t("signIn")}
             </Link>
           </div>
         </CardFooter>

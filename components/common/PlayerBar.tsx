@@ -1,12 +1,40 @@
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+"use client";
+
+import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
+import { useAudioPlayerStore } from "@/stores/useAudioPlayerStore";
+import { formatTime } from "@/lib/utils";
+import { useEffect } from "react";
 
 export const PlayerBar = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(30);
-  const [volume, setVolume] = useState(70);
+  const {
+    currentTrack,
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    togglePlayPause,
+    seek,
+    setVolume,
+  } = useAudioPlayerStore();
+
+  // Calculate progress percentage
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  const handleSeek = (value: number[]) => {
+    const newTime = (value[0] / 100) * duration;
+    seek(newTime);
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolume(value[0]);
+  };
+
+  // Don't show player if no track
+  if (!currentTrack) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-16 md:bottom-0 left-0 right-0 bg-card border-t border-border z-30">
@@ -15,41 +43,48 @@ export const PlayerBar = () => {
         <div className="mb-2">
           <Slider
             value={[progress]}
-            onValueChange={(value) => setProgress(value[0])}
+            onValueChange={handleSeek}
             max={100}
-            step={1}
-            className="w-full"
+            step={0.1}
+            className="w-full cursor-pointer"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>2:45</span>
-            <span>8:23</span>
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
 
         {/* Player Controls */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           {/* Track Info */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-12 h-12 bg-muted rounded-md flex-shrink-0" />
+            <div className="w-12 h-12 bg-muted rounded-md flex-shrink-0 overflow-hidden">
+              {currentTrack.speaker.image ? (
+                <img
+                  src={currentTrack.speaker.image}
+                  alt={currentTrack.title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Play className="w-6 h-6 text-muted-foreground" />
+                </div>
+              )}
+            </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold truncate">
-                The Importance of Patience
-              </p>
+              <p className="font-semibold truncate">{currentTrack.title}</p>
               <p className="text-sm text-muted-foreground truncate">
-                Sheikh Ahmad Al-Khalil
+                {currentTrack.speaker.name}
               </p>
             </div>
           </div>
 
           {/* Controls */}
           <div className="flex items-center gap-2 mx-4">
-            <Button size="icon" variant="ghost">
-              <SkipBack className="w-4 h-4" />
-            </Button>
             <Button
               size="icon"
               className="bg-primary hover:bg-primary/90"
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={togglePlayPause}
             >
               {isPlaying ? (
                 <Pause className="w-5 h-5" />
@@ -57,17 +92,25 @@ export const PlayerBar = () => {
                 <Play className="w-5 h-5" />
               )}
             </Button>
-            <Button size="icon" variant="ghost">
-              <SkipForward className="w-4 h-4" />
-            </Button>
           </div>
 
           {/* Volume */}
           <div className="hidden md:flex items-center gap-2 flex-1 justify-end">
-            <Volume2 className="w-4 h-4 text-muted-foreground" />
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-8 w-8"
+              onClick={() => setVolume(volume > 0 ? 0 : 70)}
+            >
+              {volume === 0 ? (
+                <VolumeX className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+              )}
+            </Button>
             <Slider
               value={[volume]}
-              onValueChange={(value) => setVolume(value[0])}
+              onValueChange={handleVolumeChange}
               max={100}
               step={1}
               className="w-24"

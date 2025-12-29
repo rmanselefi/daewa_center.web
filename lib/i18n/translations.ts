@@ -1,0 +1,223 @@
+export type Locale = "en" | "am" | "ar";
+
+export const translations = {
+  en: {
+    // Navigation
+    home: "Home",
+    browse: "Browse",
+    search: "Search",
+    courses: "Courses",
+    library: "Library",
+    profile: "Profile",
+    
+    // Common
+    welcome: "Welcome to Daewa Zone",
+    welcomeDescription: "Your gateway to authentic Islamic knowledge. Stream lectures, Qur'an recitations, and spiritual guidance.",
+    exploreContent: "Explore Content",
+    featuredThisWeek: "Featured This Week",
+    trending: "Trending",
+    seeAll: "See All",
+    browseByCategory: "Browse by Category",
+    noContent: "No content available",
+    noFeaturedContent: "No featured content available",
+    noCategories: "No categories available",
+    loading: "Loading...",
+    category: "Category",
+    speaker: "Speaker",
+    moreFilters: "More Filters",
+    
+    // Browse
+    browseContent: "Browse Content",
+    allCategories: "All Categories",
+    allSpeakers: "All Speakers",
+    
+    // Content
+    featured: "Featured",
+    playNow: "Play Now",
+    pause: "Pause",
+    addToLibrary: "Add to Library",
+    share: "Share",
+    aboutTheSpeaker: "About the Speaker",
+    relatedContent: "Related Content",
+    
+    // Search
+    search: "Search",
+    searchPlaceholder: "Search lectures, speakers, topics...",
+    recentSearches: "Recent Searches",
+    searchResults: "Search Results",
+    popularContent: "Popular Content",
+    browseByTopic: "Browse by Topic",
+    
+    // Auth
+    signIn: "Sign In",
+    signUp: "Sign Up",
+    signOut: "Sign Out",
+    email: "Email",
+    password: "Password",
+    forgotPassword: "Forgot?",
+    continueWithGoogle: "Continue with Google",
+    dontHaveAccount: "Don't have an account?",
+    alreadyHaveAccount: "Already have an account?",
+    signInToContinue: "Sign in to continue your spiritual journey",
+    createAccountToStart: "Create an account to start listening",
+    fullName: "Full Name",
+    yourName: "Your name",
+    confirmPassword: "Confirm Password",
+    createAccount: "Create Account",
+    continueAsGuest: "Continue as Guest",
+    browsingAsGuest: "You're browsing as a guest.",
+    signInToSave: "Sign in to save your favorites, create playlists, and track your progress.",
+    invalidEmailPassword: "Invalid email or password",
+    passwordsDontMatch: "Passwords don't match",
+    userCreatedSuccess: "User created successfully",
+    failedToCreateUser: "Failed to create user",
+    emailPlaceholder: "your@email.com",
+  },
+  am: {
+    // Navigation
+    home: "መነሻ",
+    browse: "መልሶ ማግኘት",
+    search: "መፈለግ",
+    courses: "ኮርሶች",
+    library: "መጽሐፍት",
+    profile: "መገለጫ",
+    
+    // Common
+    welcome: "ወደ ዳዋ ዞን እንኳን ደህና መጡ",
+    welcomeDescription: "ወደ እውነተኛ የእስላም እውቀት መግቢያዎ. ንግግሮችን፣ የቁርአን ንባቦችን እና መንፈሳዊ መመሪያዎችን ያስተምሩ።",
+    exploreContent: "ይዘት ያስሱ",
+    featuredThisWeek: "በዚህ ሳምንት የተመረጡ",
+    trending: "ታዋቂ",
+    seeAll: "ሁሉንም ይመልከቱ",
+    browseByCategory: "በምድብ ይሂዱ",
+    noContent: "ይዘት አልተገኘም",
+    noFeaturedContent: "የተመረጠ ይዘት አልተገኘም",
+    noCategories: "ምድቦች አልተገኙም",
+    loading: "በመጫን ላይ...",
+    category: "ምድብ",
+    speaker: "አዋላጅ",
+    moreFilters: "ተጨማሪ ማጣሪያዎች",
+    
+    // Browse
+    browseContent: "ይዘት ይልሱ",
+    allCategories: "ሁሉም ምድቦች",
+    allSpeakers: "ሁሉም አዋላጆች",
+    
+    // Content
+    featured: "የተመረጠ",
+    playNow: "አሁን ይጫወቱ",
+    pause: "ቆም",
+    addToLibrary: "ወደ መጽሐፍት ያክሉ",
+    share: "አጋራ",
+    aboutTheSpeaker: "ስለ አዋላጁ",
+    relatedContent: "የተዛመዱ ይዘቶች",
+    
+    // Search
+    search: "መፈለግ",
+    searchPlaceholder: "ንግግሮች፣ አዋላጆች፣ ርዕሶች ይፈልጉ...",
+    recentSearches: "የቅርብ ጊዜ ፍለጋዎች",
+    searchResults: "የፍለጋ ውጤቶች",
+    popularContent: "ታዋቂ ይዘት",
+    browseByTopic: "በርዕስ ይሂዱ",
+    
+    // Auth
+    signIn: "ግባ",
+    signUp: "ተመዝግብ",
+    signOut: "ውጣ",
+    email: "ኢሜይል",
+    password: "የይለፍ ቃል",
+    forgotPassword: "መርሳት?",
+    continueWithGoogle: "በጉግል ይቀጥሉ",
+    dontHaveAccount: "መለያ የለዎትም?",
+    alreadyHaveAccount: "አስቀድመው መለያ አላችሁ?",
+    signInToContinue: "መንፈሳዊ ጉዞዎን ለመቀጠል ይግቡ",
+    createAccountToStart: "ለመስማት መለያ ይፍጠሩ",
+    fullName: "ሙሉ ስም",
+    yourName: "ስምዎ",
+    confirmPassword: "የይለፍ ቃል ያረጋግጡ",
+    createAccount: "መለያ ይፍጠሩ",
+    continueAsGuest: "እንደ እንግዳ ይቀጥሉ",
+    browsingAsGuest: "እንደ እንግዳ እያሰራጩ ነዎት።",
+    signInToSave: "ወዳጆችዎን ለማስቀጠል፣ የመዝግብ ዝርዝሮችን ለመፍጠር እና እድገትዎን ለመከታተል ይግቡ።",
+    invalidEmailPassword: "ልክ ያልሆነ ኢሜይል ወይም የይለፍ ቃል",
+    passwordsDontMatch: "የይለፍ ቃሎች አይጣጣሙም",
+    userCreatedSuccess: "ተጠቃሚ በተሳካ ሁኔታ ተፈጥሯል",
+    failedToCreateUser: "ተጠቃሚ መፍጠር አልተሳካም",
+    emailPlaceholder: "your@email.com",
+  },
+  ar: {
+    // Navigation
+    home: "الرئيسية",
+    browse: "تصفح",
+    search: "بحث",
+    courses: "الدورات",
+    library: "المكتبة",
+    profile: "الملف الشخصي",
+    
+    // Common
+    welcome: "مرحباً بك في داوة زون",
+    welcomeDescription: "بوابتك إلى المعرفة الإسلامية الأصيلة. شغّل المحاضرات وتلاوات القرآن والإرشاد الروحي.",
+    exploreContent: "استكشف المحتوى",
+    featuredThisWeek: "المميز هذا الأسبوع",
+    trending: "الرائج",
+    seeAll: "عرض الكل",
+    browseByCategory: "تصفح حسب الفئة",
+    noContent: "لا يوجد محتوى متاح",
+    noFeaturedContent: "لا يوجد محتوى مميز متاح",
+    noCategories: "لا توجد فئات متاحة",
+    loading: "جاري التحميل...",
+    category: "الفئة",
+    speaker: "المتحدث",
+    moreFilters: "المزيد من المرشحات",
+    
+    // Browse
+    browseContent: "تصفح المحتوى",
+    allCategories: "جميع الفئات",
+    allSpeakers: "جميع المتحدثين",
+    
+    // Content
+    featured: "مميز",
+    playNow: "شغل الآن",
+    pause: "إيقاف",
+    addToLibrary: "أضف إلى المكتبة",
+    share: "مشاركة",
+    aboutTheSpeaker: "عن المتحدث",
+    relatedContent: "محتوى ذو صلة",
+    
+    // Search
+    search: "بحث",
+    searchPlaceholder: "ابحث عن المحاضرات والمتحدثين والمواضيع...",
+    recentSearches: "البحث الأخير",
+    searchResults: "نتائج البحث",
+    popularContent: "المحتوى الشائع",
+    browseByTopic: "تصفح حسب الموضوع",
+    
+    // Auth
+    signIn: "تسجيل الدخول",
+    signUp: "إنشاء حساب",
+    signOut: "تسجيل الخروج",
+    email: "البريد الإلكتروني",
+    password: "كلمة المرور",
+    forgotPassword: "نسيت؟",
+    continueWithGoogle: "المتابعة مع جوجل",
+    dontHaveAccount: "ليس لديك حساب؟",
+    alreadyHaveAccount: "لديك حساب بالفعل؟",
+    signInToContinue: "سجل الدخول لمتابعة رحلتك الروحية",
+    createAccountToStart: "أنشئ حساباً للبدء في الاستماع",
+    fullName: "الاسم الكامل",
+    yourName: "اسمك",
+    confirmPassword: "تأكيد كلمة المرور",
+    createAccount: "إنشاء حساب",
+    continueAsGuest: "المتابعة كضيف",
+    browsingAsGuest: "أنت تتصفح كضيف.",
+    signInToSave: "سجل الدخول لحفظ مفضلاتك وإنشاء قوائم التشغيل وتتبع تقدمك.",
+    invalidEmailPassword: "بريد إلكتروني أو كلمة مرور غير صحيحة",
+    passwordsDontMatch: "كلمات المرور غير متطابقة",
+    userCreatedSuccess: "تم إنشاء المستخدم بنجاح",
+    failedToCreateUser: "فشل في إنشاء المستخدم",
+    emailPlaceholder: "your@email.com",
+  },
+} as const;
+
+export type TranslationKey = keyof typeof translations.en;
+

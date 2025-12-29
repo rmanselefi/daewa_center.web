@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import { AuthService, CreateUserReq } from "@/services/auth.service";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export const USER_KEYS = {
   all: ["users"] as const,
@@ -58,16 +59,24 @@ export function useUser() {
   return useQuery({
     queryKey: USER_KEYS.detail("me"),
     queryFn: async () => {
-      try {
-        const response = await AuthService.getUserMe();
-        console.log("getUserMe response:", response);
-        return response || null;
-      } catch (error) {
-        console.error("getUserMe error:", error);
-        throw error;
-      }
+      const response = await AuthService.getUserMe();
+      return response || null;
     },
     retry: false,
+    // Suppress 401 errors - they're expected when user is not logged in
+    onError: (error) => {
+      // Only log non-401 errors
+      if (error instanceof AxiosError && error.response?.status !== 401) {
+        console.error("getUserMe error:", error);
+      }
+    },
+    // Don't throw 401 errors to React Query
+    throwOnError: (error) => {
+      if (error instanceof AxiosError && error.response?.status === 401) {
+        return false; // Don't throw 401 errors
+      }
+      return true; // Throw other errors
+    },
   });
 }
 
@@ -80,8 +89,9 @@ export function useUserRegister() {
       qc.invalidateQueries({ queryKey: USER_KEYS.lists() });
       toast.success("User created successfully");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       toast.error(error.response?.data?.message || "Failed to create user");
     },
   });
 }
+

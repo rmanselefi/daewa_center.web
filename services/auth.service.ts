@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import axios, { AxiosError } from "axios";
 
 export type UserResponse = {
   id: string;
@@ -14,24 +15,64 @@ export type CreateUserReq = {
   fullname: string;
 };
 
+type ApiErrorData = { message?: string };
+
+function rethrowApiError(error: unknown, fallbackMessage: string): never {
+  // Preserve AxiosError so callers can read error.response?.data?.message, status, etc.
+  if (axios.isAxiosError<ApiErrorData>(error)) {
+    throw error as AxiosError<ApiErrorData>;
+  }
+
+  if (error instanceof Error) {
+    throw error;
+  }
+
+  throw new Error(fallbackMessage);
+}
+
 export const AuthService = {
   async login(email: string, password: string) {
-    const response = await api.post("/api/auth/login", { email, password });
-    return response.data;
+    try {
+      const response = await api.post("/api/v1/auth/login", { email, password });
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.login] failed", error);
+      rethrowApiError(error, "Failed to login");
+    }
   },
 
   async LogOut() {
-    const response = await api.post("/api/auth/logout");
-    return response.data;
+    try {
+      const response = await api.post("/api/v1/auth/logout");
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.LogOut] failed", error);
+      rethrowApiError(error, "Failed to logout");
+    }
   },
 
-  async getUserMe(): Promise<UserResponse> {
-    const response = await api.get("/api/auth/me");
-    return response.data;
+  async getUserMe(): Promise<UserResponse | null> {
+    try {
+      const response = await api.get("/api/v1/auth/me");
+      return response.data;
+    } catch (error) {
+      // 401 is expected when user is not logged in, return null instead of throwing
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return null;
+      }
+      // Only log non-401 errors
+      console.error("[AuthService.getUserMe] failed", error);
+      rethrowApiError(error, "Failed to fetch user");
+    }
   },
 
   async createUser({ email, password, fullname }: CreateUserReq) {
-    const response = await api.post("/api/user", { email, password, fullname });
-    return response.data;
+    try {
+      const response = await api.post("/api/v1/user", { email, password, fullname });
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.createUser] failed", error);
+      rethrowApiError(error, "Failed to create user");
+    }
   },
 };

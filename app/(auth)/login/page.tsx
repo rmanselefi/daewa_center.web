@@ -15,10 +15,12 @@ import Link from "next/link";
 import { useLogin } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useI18n } from "@/stores/useI18nStore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { t } = useI18n();
 
   const { mutate: login, isPending, error } = useLogin();
   const router = useRouter();
@@ -31,7 +33,7 @@ const Login = () => {
           router.push("/home");
         },
         onError: () => {
-          toast.error("Invalid email or password");
+          toast.error(t("invalidEmailPassword"));
         },
       }
     );
@@ -45,17 +47,17 @@ const Login = () => {
             Daewa Zone
           </CardTitle>
           <CardDescription>
-            Sign in to continue your spiritual journey
+            {t("signInToContinue")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t("emailPlaceholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -63,12 +65,12 @@ const Login = () => {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("password")}</Label>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-muted-foreground hover:text-primary"
                 >
-                  Forgot?
+                  {t("forgotPassword")}
                 </Link>
               </div>
               <Input
@@ -81,7 +83,7 @@ const Login = () => {
               />
             </div>
             <Button type="submit" className="w-full">
-              Sign In
+              {t("signIn")}
             </Button>
           </form>
         </CardContent>
@@ -91,15 +93,15 @@ const Login = () => {
             className="w-full"
             onClick={() => router.push("/home")}
           >
-            Continue as Guest
+            {t("continueAsGuest")}
           </Button>
           <div className="text-sm text-center text-muted-foreground">
-            Don&apos;t have an account?{" "}
+            {t("dontHaveAccount")}{" "}
             <Link
               href="/register"
               className="text-primary hover:underline font-medium"
             >
-              Sign up
+              {t("signUp")}
             </Link>
           </div>
         </CardFooter>

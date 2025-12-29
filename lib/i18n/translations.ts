@@ -41,7 +41,6 @@ export const translations = {
     relatedContent: "Related Content",
     
     // Search
-    search: "Search",
     searchPlaceholder: "Search lectures, speakers, topics...",
     recentSearches: "Recent Searches",
     searchResults: "Search Results",
@@ -113,7 +112,6 @@ export const translations = {
     relatedContent: "የተዛመዱ ይዘቶች",
     
     // Search
-    search: "መፈለግ",
     searchPlaceholder: "ንግግሮች፣ አዋላጆች፣ ርዕሶች ይፈልጉ...",
     recentSearches: "የቅርብ ጊዜ ፍለጋዎች",
     searchResults: "የፍለጋ ውጤቶች",
@@ -185,7 +183,6 @@ export const translations = {
     relatedContent: "محتوى ذو صلة",
     
     // Search
-    search: "بحث",
     searchPlaceholder: "ابحث عن المحاضرات والمتحدثين والمواضيع...",
     recentSearches: "البحث الأخير",
     searchResults: "نتائج البحث",

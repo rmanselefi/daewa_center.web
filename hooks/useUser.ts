@@ -2,8 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
-import { AuthService, CreateUserReq } from "@/services/auth.service";
+import { AuthService, CreateUserReq, UserResponse } from "@/services/auth.service";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -56,27 +55,25 @@ export function useLogout() {
 }
 
 export function useUser() {
-  return useQuery({
+  return useQuery<UserResponse | null>({
     queryKey: USER_KEYS.detail("me"),
     queryFn: async () => {
-      const response = await AuthService.getUserMe();
-      return response || null;
+      try {
+        const response = await AuthService.getUserMe();
+        return response || null;
+      } catch (error) {
+        // Suppress 401 errors - they're expected when user is not logged in
+        if (error instanceof AxiosError && error.response?.status === 401) {
+          return null; // Return null for 401 errors instead of throwing
+        }
+        // Only log non-401 errors
+        if (error instanceof AxiosError && error.response?.status !== 401) {
+          console.error("getUserMe error:", error);
+        }
+        throw error; // Re-throw other errors
+      }
     },
     retry: false,
-    // Suppress 401 errors - they're expected when user is not logged in
-    onError: (error) => {
-      // Only log non-401 errors
-      if (error instanceof AxiosError && error.response?.status !== 401) {
-        console.error("getUserMe error:", error);
-      }
-    },
-    // Don't throw 401 errors to React Query
-    throwOnError: (error) => {
-      if (error instanceof AxiosError && error.response?.status === 401) {
-        return false; // Don't throw 401 errors
-      }
-      return true; // Throw other errors
-    },
   });
 }
 

@@ -6,10 +6,12 @@ import { Settings, Bell, Download, HelpCircle, LogOut } from "lucide-react";
 import { useUser, useLogout } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { UserResponse } from "@/services/auth.service";
 
 export default function Profile() {
   const router = useRouter();
   const { data: user, isLoading } = useUser();
+  const typedUser = user as UserResponse | null | undefined;
   const { mutate: logout } = useLogout();
 
   useEffect(() => {
@@ -28,21 +30,21 @@ export default function Profile() {
         <div className="flex items-center gap-4 mb-6">
           <Avatar className="w-20 h-20">
             <AvatarFallback className="text-2xl bg-primary text-primary-foreground">
-              {user?.fullname
-                ? user.fullname
+              {typedUser?.fullname
+                ? typedUser.fullname
                     .split(" ")
-                    .map((n: any) => n[0])
+                    .map((n: string) => n[0])
                     .join("")
                     .toUpperCase()
                     .slice(0, 2)
-                : user?.email?.slice(0, 2).toUpperCase()}
+                : typedUser?.email?.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <h2 className="text-2xl font-bold">
-              {user?.fullname || user?.email || "User"}
+              {typedUser?.fullname || typedUser?.email || "User"}
             </h2>
-            <p className="text-muted-foreground">{user?.email}</p>
+            <p className="text-muted-foreground">{typedUser?.email}</p>
           </div>
         </div>
         <Button variant="outline">Edit Profile</Button>

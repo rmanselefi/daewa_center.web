@@ -30,6 +30,11 @@ export const translations = {
     browseContent: "Browse Content",
     allCategories: "All Categories",
     allSpeakers: "All Speakers",
+    result: "result",
+    results: "results",
+    loadingMore: "Loading more...",
+    noMoreContent: "No more content to load",
+    errorLoadingContent: "Error loading content. Please try again.",
     
     // Content
     featured: "Featured",
@@ -101,6 +106,11 @@ export const translations = {
     browseContent: "ይዘት ይልሱ",
     allCategories: "ሁሉም ምድቦች",
     allSpeakers: "ሁሉም አዋላጆች",
+    result: "ውጤት",
+    results: "ውጤቶች",
+    loadingMore: "ተጨማሪ በመጫን ላይ...",
+    noMoreContent: "ተጨማሪ ይዘት የለም",
+    errorLoadingContent: "ይዘት ማስገባት አልተሳካም። እባክዎ እንደገና ይሞክሩ።",
     
     // Content
     featured: "የተመረጠ",
@@ -172,6 +182,11 @@ export const translations = {
     browseContent: "تصفح المحتوى",
     allCategories: "جميع الفئات",
     allSpeakers: "جميع المتحدثين",
+    result: "نتيجة",
+    results: "نتائج",
+    loadingMore: "جاري تحميل المزيد...",
+    noMoreContent: "لا يوجد المزيد من المحتوى",
+    errorLoadingContent: "خطأ في تحميل المحتوى. يرجى المحاولة مرة أخرى.",
     
     // Content
     featured: "مميز",

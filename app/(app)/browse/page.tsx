@@ -41,7 +41,7 @@ export default function Browse() {
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: speakers = [], isLoading: isLoadingSpeakers } = useSpeakers();
-  const { data: playlists = [], isLoading: isLoadingPlaylists } = usePlaylists();
+  const { data: playlists = [] } = usePlaylists();
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
 
   const filters = {
@@ -155,7 +155,7 @@ export default function Browse() {
         {/* Results count */}
         {!isLoading && totalItems > 0 && (
           <div className="mb-4 text-sm text-muted-foreground">
-            {totalItems} {totalItems === 1 ? t("result") || "result" : t("results") || "results"}
+            {totalItems} {totalItems === 1 ? t("result") : t("results")}
           </div>
         )}
 

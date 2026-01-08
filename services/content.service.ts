@@ -1,5 +1,6 @@
 import api from "@/lib/api";
 import axios, { AxiosError } from "axios";
+import { createSlug } from "@/lib/utils";
 
 export type ContentItem = {
   id: string;
@@ -30,6 +31,8 @@ export type ContentItem = {
     address: string;
     image: string | null;
   };
+  // Slug is generated from title on the frontend if not provided by API
+  slug?: string;
 };
 
 type ApiErrorData = { message?: string };
@@ -76,9 +79,21 @@ export type Category = {
 };
 
 export type ContentFilters = {
-  categoryId?: string;
-  speakerId?: string;
+  category?: string; // UUID of category
+  speaker?: string; // UUID of speaker
+  search?: string;
+  page?: number;
   limit?: number;
+};
+
+export type ContentResponse = {
+  data: ContentItem[];
+  meta: {
+    total: number;
+    page: number;
+    limit: string | number;
+    totalPages: number;
+  };
 };
 
 export const ContentService = {
@@ -102,14 +117,20 @@ export const ContentService = {
     }
   },
 
-  async getAll(filters?: ContentFilters): Promise<ContentItem[]> {
+  async getAll(filters?: ContentFilters): Promise<ContentResponse> {
     try {
       const params = new URLSearchParams();
-      if (filters?.categoryId) {
-        params.append("categoryId", filters.categoryId);
+      if (filters?.category) {
+        params.append("category", filters.category);
       }
-      if (filters?.speakerId) {
-        params.append("speakerId", filters.speakerId);
+      if (filters?.speaker) {
+        params.append("speaker", filters.speaker);
+      }
+      if (filters?.search) {
+        params.append("search", filters.search);
+      }
+      if (filters?.page) {
+        params.append("page", filters.page.toString());
       }
       if (filters?.limit) {
         params.append("limit", filters.limit.toString());
@@ -192,6 +213,50 @@ export const ContentService = {
       console.error("[ContentService.getById] failed", error);
       rethrowApiError(error, "Failed to fetch content");
     }
+  },
+
+  async getBySlug(slug: string): Promise<ContentItem> {
+    // Find the UUID that corresponds to this slug by searching through content
+    // Then use getById with the UUID to fetch the content (API always uses UUID)
+    
+    // Fetch content to find the matching slug and get its UUID
+    const searchResponse = await api.get(`/content?limit=100`);
+    const contentList = searchResponse.data?.data || searchResponse.data || [];
+    
+    // Find content by matching generated slug
+    let found = contentList.find((item: ContentItem) => {
+      const itemSlug = item.slug || createSlug(item.title);
+      return itemSlug === slug;
+    });
+    
+    // If not found in first page, search through more pages
+    if (!found) {
+      let page = 2;
+      while (page <= 10) { // Limit to 10 pages to avoid infinite loops
+        try {
+          const pageResponse = await api.get(`/content?page=${page}&limit=100`);
+          const pageContentList = pageResponse.data?.data || pageResponse.data || [];
+          if (!pageContentList || pageContentList.length === 0) break;
+          
+          found = pageContentList.find((item: ContentItem) => {
+            const itemSlug = item.slug || createSlug(item.title);
+            return itemSlug === slug;
+          });
+          
+          if (found) break;
+          page++;
+        } catch (pageError) {
+          break;
+        }
+      }
+    }
+    
+    if (!found) {
+      throw new Error("Content not found");
+    }
+    
+    // Now use the UUID to fetch the content (API always uses UUID)
+    return this.getById(found.id);
   },
 
 };

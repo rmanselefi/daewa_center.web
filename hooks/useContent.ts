@@ -1,7 +1,7 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { ContentService, ContentItem, CategoryPreview, Speaker, Category, ContentFilters } from "@/services/content.service";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { ContentService, ContentItem, CategoryPreview, Speaker, Category, ContentFilters, ContentResponse } from "@/services/content.service";
 
 export const CONTENT_KEYS = {
   all: ["content"] as const,
@@ -50,16 +50,47 @@ export function useCategoryPreview() {
 }
 
 export function useContent(filters?: ContentFilters) {
-  return useQuery<ContentItem[]>({
+  return useQuery<ContentResponse>({
     queryKey: CONTENT_KEYS.list(filters),
     queryFn: async () => {
       try {
         const response = await ContentService.getAll(filters);
-        return response || [];
+        return response || { data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
       } catch (error) {
         console.error("getAll content error:", error);
         throw error;
       }
+    },
+    retry: false,
+  });
+}
+
+export function useInfiniteContent(filters?: Omit<ContentFilters, "page">) {
+  return useInfiniteQuery<ContentResponse>({
+    queryKey: [...CONTENT_KEYS.list(filters), "infinite"],
+    queryFn: async ({ pageParam = 1 }) => {
+      try {
+        const response = await ContentService.getAll({
+          ...filters,
+          page: pageParam as number,
+        });
+        return response || { data: [], meta: { total: 0, page: 1, limit: 10, totalPages: 0 } };
+      } catch (error) {
+        console.error("getAll content error:", error);
+        throw error;
+      }
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const currentPage = typeof lastPage.meta.page === "string" 
+        ? parseInt(lastPage.meta.page) 
+        : lastPage.meta.page;
+      const totalPages = lastPage.meta.totalPages;
+      
+      if (currentPage < totalPages) {
+        return currentPage + 1;
+      }
+      return undefined;
     },
     retry: false,
   });
@@ -176,6 +207,23 @@ export function useContentById(id: string) {
       }
     },
     enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useContentBySlug(slug: string) {
+  return useQuery<ContentItem>({
+    queryKey: [...CONTENT_KEYS.all, "bySlug", slug],
+    queryFn: async () => {
+      try {
+        const response = await ContentService.getBySlug(slug);
+        return response;
+      } catch (error) {
+        console.error("getBySlug error:", error);
+        throw error;
+      }
+    },
+    enabled: !!slug,
     retry: false,
   });
 }

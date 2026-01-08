@@ -7,8 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Play, Pause, Plus, Share2, Clock, Calendar } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { useI18n } from "@/stores/useI18nStore";
-import { useContentById } from "@/hooks/useContent";
+import { useContentBySlug } from "@/hooks/useContent";
 import { useAudioPlayerStore } from "@/stores/useAudioPlayerStore";
+import { getContentSlug } from "@/lib/utils";
 
 interface ContentDetailProps {
   params: Promise<{
@@ -20,8 +21,8 @@ export default function ContentDetail({ params }: ContentDetailProps) {
   const { slug } = use(params);
   const router = useRouter();
   const { t } = useI18n();
-  // The slug in the URL is actually the content ID
-  const { data: content, isLoading } = useContentById(slug);
+  // Fetch content by slug from URL
+  const { data: content, isLoading } = useContentBySlug(slug);
   
   // Hardcoded related content for now
   const relatedContent = [
@@ -225,7 +226,7 @@ export default function ContentDetail({ params }: ContentDetailProps) {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${item.id}`)}
+                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
               />
             ))}
           </div>

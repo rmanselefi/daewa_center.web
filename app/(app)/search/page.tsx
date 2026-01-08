@@ -5,23 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Search as SearchIcon, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Playlist } from "../browse/page";
 import { useI18n } from "@/stores/useI18nStore";
 import { useSearch, useRecentSearches, usePopularContent, useCategoryPreview } from "@/hooks/useContent";
-import { createSlug } from "@/lib/utils";
-
+import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
+import { createSlug, getContentSlug } from "@/lib/utils";
+import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import LoginBanner from "@/components/common/LoginBanner";
 
 export default function Search() {
   const router = useRouter();
   const { t } = useI18n();
-  const [playlists, setPlaylists] = useState<Playlist[]>([
-    { id: "p1", title: "Morning Reminders", count: 12 },
-    { id: "p2", title: "Tafsir Series", count: 30 },
-    { id: "p3", title: "Character Development", count: 15 },
-  ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [contentIdForPlaylist, setContentIdForPlaylist] = useState<string | undefined>();
 
   // Debounce search query
   useEffect(() => {
@@ -37,6 +34,8 @@ export default function Search() {
   const { data: recentSearches = [], isLoading: isLoadingRecent } = useRecentSearches(10);
   const { data: popularContent = [], isLoading: isLoadingPopular } = usePopularContent(20);
   const { data: categories = [], isLoading: isLoadingCategories } = useCategoryPreview();
+  const { data: playlists = [] } = usePlaylists();
+  const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
 
   return (
     <>
@@ -119,13 +118,18 @@ export default function Search() {
                     speaker={item.speaker.name}
                     duration={item.duration || "--:--"}
                     image={item.speaker.image || undefined}
-                    onClick={() => router.push(`/content/${item.id}`)}
-                    onAddToPlaylist={(playlistId) =>
-                      setPlaylists([
-                        ...playlists,
-                        { id: playlistId, title: playlistId, count: 0 },
-                      ])
-                    }
+                    onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                    contentId={item.id}
+                    onAddToPlaylist={(playlistId) => {
+                      addContentToPlaylist({
+                        playlistId,
+                        contentId: item.id,
+                      });
+                    }}
+                    onCreatePlaylist={(contentId) => {
+                      setContentIdForPlaylist(contentId);
+                      setIsCreateModalOpen(true);
+                    }}
                     playlists={playlists}
                   />
                 ))}
@@ -154,13 +158,18 @@ export default function Search() {
                     speaker={item.speaker.name}
                     duration={item.duration || "--:--"}
                     image={item.speaker.image || undefined}
-                    onClick={() => router.push(`/content/${item.id}`)}
-                    onAddToPlaylist={(playlistId) =>
-                      setPlaylists([
-                        ...playlists,
-                        { id: playlistId, title: playlistId, count: 0 },
-                      ])
-                    }
+                    onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                    contentId={item.id}
+                    onAddToPlaylist={(playlistId) => {
+                      addContentToPlaylist({
+                        playlistId,
+                        contentId: item.id,
+                      });
+                    }}
+                    onCreatePlaylist={(contentId) => {
+                      setContentIdForPlaylist(contentId);
+                      setIsCreateModalOpen(true);
+                    }}
                     playlists={playlists}
                   />
                 ))}
@@ -203,6 +212,11 @@ export default function Search() {
           )}
         </div>
       </div>
+
+      <CreatePlaylistModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
     </>
   );
 }

@@ -26,3 +26,8 @@ export function formatTime(seconds: number): string {
   }
   return `${minutes}:${secs.toString().padStart(2, "0")}`;
 }
+
+// Get slug from content item (use existing slug or generate from title)
+export function getContentSlug(content: { slug?: string; title: string }): string {
+  return content.slug || createSlug(content.title);
+}

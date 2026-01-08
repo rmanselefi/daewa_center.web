@@ -1,4 +1,4 @@
-import { Play, ListPlus } from "lucide-react";
+import { Play, ListPlus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 interface ContentCardProps {
@@ -13,9 +14,11 @@ interface ContentCardProps {
   speaker: string;
   duration: string;
   image?: string;
+  contentId?: string; // ID of the content item
   onClick?: () => void;
   onAddToPlaylist?: (playlistId: string) => void;
-  playlists?: Array<{ id: string; title: string; count: number }>;
+  onCreatePlaylist?: (contentId?: string) => void;
+  playlists?: Array<{ id: string; name: string; items: any[] }>;
 }
 
 export const ContentCard = ({
@@ -23,10 +26,15 @@ export const ContentCard = ({
   speaker,
   duration,
   image,
+  contentId,
   onClick,
   onAddToPlaylist,
+  onCreatePlaylist,
   playlists,
 }: ContentCardProps) => {
+  // Show max 4 playlists
+  const displayedPlaylists = playlists?.slice(0, 4) || [];
+  const hasMorePlaylists = playlists && playlists.length > 4;
   return (
     <Card className="group relative overflow-hidden transition-all hover:bg-muted/50">
       <div
@@ -58,7 +66,7 @@ export const ContentCard = ({
             <p className="text-sm text-muted-foreground truncate">{speaker}</p>
             <p className="text-xs text-muted-foreground mt-1">{duration}</p>
           </div>
-          {onAddToPlaylist && playlists && playlists.length > 0 && (
+          {(onAddToPlaylist || onCreatePlaylist) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -71,17 +79,46 @@ export const ContentCard = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-popover z-50">
-                {playlists.map((playlist) => (
-                  <DropdownMenuItem
-                    key={playlist.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddToPlaylist(playlist.id);
-                    }}
-                  >
-                    {playlist.title}
-                  </DropdownMenuItem>
-                ))}
+                {displayedPlaylists.length > 0 && onAddToPlaylist && (
+                  <>
+                    {displayedPlaylists.map((playlist, index) => (
+                      <DropdownMenuItem
+                        key={`${playlist.id}-${index}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAddToPlaylist?.(playlist.id);
+                        }}
+                      >
+                        {playlist.name}
+                      </DropdownMenuItem>
+                    ))}
+                    {hasMorePlaylists && (
+                      <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                        +{playlists.length - 4} more
+                      </div>
+                    )}
+                  </>
+                )}
+                {displayedPlaylists.length === 0 && onAddToPlaylist && (
+                  <div className="px-2 py-1.5 text-xs text-muted-foreground">
+                    No playlists yet
+                  </div>
+                )}
+                {onCreatePlaylist && (
+                  <>
+                    {displayedPlaylists.length > 0 && <DropdownMenuSeparator />}
+                    <DropdownMenuItem
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreatePlaylist?.(contentId);
+                      }}
+                      className="text-primary focus:text-primary"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create Playlist
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

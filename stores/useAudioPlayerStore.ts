@@ -124,7 +124,9 @@ export const useAudioPlayerStore = create<AudioPlayerState>()(
               newAudio.crossOrigin = "anonymous";
               newAudio.src = track.audioUrl;
               newAudio.volume = get().volume / 100;
-              newAudio.preload = "auto";
+              // Use "metadata" for streaming - only loads metadata, not entire file
+              // Browser will use HTTP Range Requests to stream audio chunks as needed
+              newAudio.preload = "metadata";
               newAudio.load();
               set({ currentTrack: track, currentTime: 0, duration: 0 });
             }
@@ -148,7 +150,9 @@ export const useAudioPlayerStore = create<AudioPlayerState>()(
             // Set new source
             audio.src = track.audioUrl;
             audio.volume = get().volume / 100;
-            audio.preload = "auto";
+            // Use "metadata" for streaming - only loads metadata, not entire file
+            // Browser will use HTTP Range Requests to stream audio chunks as needed
+            audio.preload = "metadata";
             audio.load();
             
             set({ currentTrack: track, currentTime: 0, duration: 0 });

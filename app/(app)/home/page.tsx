@@ -5,7 +5,7 @@ import { ContentCard } from "@/app/features/home/ContentCard";
 import { useRouter } from "next/navigation";
 import LoginBanner from "@/components/common/LoginBanner";
 import { useFeaturedContent, useCategoryPreview, useTrendingContent } from "@/hooks/useContent";
-import { createSlug } from "@/lib/utils";
+import { createSlug, getContentSlug } from "@/lib/utils";
 import { useI18n } from "@/stores/useI18nStore";
 
 export default function Home() {
@@ -66,7 +66,7 @@ export default function Home() {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${item.id}`)}
+                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
               />
             ))}
           </div>
@@ -103,7 +103,7 @@ export default function Home() {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${item.id}`)}
+                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
               />
             ))}
           </div>

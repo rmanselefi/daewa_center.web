@@ -16,9 +16,11 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { Playlist } from "../browse/page";
+import { createSlug } from "@/lib/utils";
 
 import { useUser } from "@/hooks/useUser";
+import { usePlaylists, useCreatePlaylist, useAddContentToPlaylist } from "@/hooks/usePlaylist";
+import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import { useEffect } from "react";
 
 export default function Library() {
@@ -32,30 +34,30 @@ export default function Library() {
   }, [user, isLoading, router]);
 
   if (isLoading) return null;
-  const [playlists, setPlaylists] = useState<Playlist[]>([
-    { id: "p1", title: "Morning Reminders", count: 12 },
-    { id: "p2", title: "Tafsir Series", count: 30 },
-    { id: "p3", title: "Character Development", count: 15 },
-  ]);
+  
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDescription, setPlaylistDescription] = useState("");
 
+  const { data: playlists = [], isLoading: isLoadingPlaylists } = usePlaylists();
+  const { mutate: createPlaylist, isPending: isCreatingPlaylist } = useCreatePlaylist();
+  const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
+
   const savedContent = [
     {
-      id: 1,
+      id: "1",
       title: "The Prophetic Way",
       speaker: "Sheikh Omar Suleiman",
       duration: "45:32",
     },
     {
-      id: 2,
+      id: "2",
       title: "Understanding Tawheed",
       speaker: "Imam Yasir Qadhi",
       duration: "52:18",
     },
     {
-      id: 3,
+      id: "3",
       title: "Stories of the Sahaba",
       speaker: "Mufti Menk",
       duration: "38:45",
@@ -64,13 +66,13 @@ export default function Library() {
 
   const recentlyPlayed = [
     {
-      id: 5,
+      id: "5",
       title: "The Power of Dua",
       speaker: "Nouman Ali Khan",
       duration: "28:30",
     },
     {
-      id: 6,
+      id: "6",
       title: "Patience in Hardship",
       speaker: "Sheikh Ahmad Al-Khalil",
       duration: "35:42",
@@ -78,13 +80,21 @@ export default function Library() {
   ];
 
   const handleCreatePlaylist = () => {
-    setPlaylists([
-      ...playlists,
-      { id: "p" + playlists.length + 1, title: playlistName, count: 0 },
-    ]);
-    setPlaylistName("");
-    setPlaylistDescription("");
-    setIsDialogOpen(false);
+    if (!playlistName.trim()) return;
+    
+    createPlaylist(
+      {
+        name: playlistName,
+        description: playlistDescription || undefined,
+      },
+      {
+        onSuccess: () => {
+          setPlaylistName("");
+          setPlaylistDescription("");
+          setIsDialogOpen(false);
+        },
+      }
+    );
   };
 
   return (
@@ -106,13 +116,15 @@ export default function Library() {
                 title={item.title}
                 speaker={item.speaker}
                 duration={item.duration}
-                onClick={() => router.push(`/content/${item.id}`)}
-                onAddToPlaylist={(playlistId) =>
-                  setPlaylists([
-                    ...playlists,
-                    { id: playlistId, title: playlistId, count: 0 },
-                  ])
-                }
+                onClick={() => router.push(`/content/${createSlug(item.title)}`)}
+                contentId={item.id}
+                onAddToPlaylist={(playlistId) => {
+                  addContentToPlaylist({
+                    playlistId,
+                    contentId: item.id,
+                  });
+                }}
+                onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
                 playlists={playlists}
               />
             ))}
@@ -127,13 +139,15 @@ export default function Library() {
                 title={item.title}
                 speaker={item.speaker}
                 duration={item.duration}
-                onClick={() => router.push(`/content/${item.id}`)}
-                onAddToPlaylist={(playlistId) =>
-                  setPlaylists([
-                    ...playlists,
-                    { id: playlistId, title: playlistId, count: 0 },
-                  ])
-                }
+                onClick={() => router.push(`/content/${createSlug(item.title)}`)}
+                contentId={item.id}
+                onAddToPlaylist={(playlistId) => {
+                  addContentToPlaylist({
+                    playlistId,
+                    contentId: item.id,
+                  });
+                }}
+                onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
                 playlists={playlists}
               />
             ))}
@@ -181,32 +195,50 @@ export default function Library() {
                   <Button
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
+                    disabled={isCreatingPlaylist}
                   >
                     Cancel
                   </Button>
-                  <Button onClick={handleCreatePlaylist}>Create</Button>
+                  <Button onClick={handleCreatePlaylist} disabled={isCreatingPlaylist || !playlistName.trim()}>
+                    {isCreatingPlaylist ? "Creating..." : "Create"}
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {playlists.map((playlist) => (
-              <div
-                key={playlist.id}
-                className="aspect-square bg-card rounded-lg p-6 flex flex-col justify-between cursor-pointer hover:bg-muted/50 transition-colors"
-              >
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">
-                    {playlist.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {playlist.count} lectures
-                  </p>
+          {isLoadingPlaylists ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-muted rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : playlists.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {playlists.map((playlist) => (
+                <div
+                  key={playlist.id}
+                  className="aspect-square bg-card rounded-lg p-6 flex flex-col justify-between cursor-pointer hover:bg-muted/50 transition-colors"
+                >
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">
+                      {playlist.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {playlist.items?.length || 0} {(playlist.items?.length || 0) === 1 ? "lecture" : "lectures"}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              No playlists yet. Create your first playlist!
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

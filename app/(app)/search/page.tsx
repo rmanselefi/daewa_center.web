@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useI18n } from "@/stores/useI18nStore";
 import { useSearch, useRecentSearches, usePopularContent, useCategoryPreview } from "@/hooks/useContent";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
+import { useUser } from "@/hooks/useUser";
 import { createSlug, getContentSlug } from "@/lib/utils";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import LoginBanner from "@/components/common/LoginBanner";
@@ -34,7 +35,11 @@ export default function Search() {
   const { data: recentSearches = [], isLoading: isLoadingRecent } = useRecentSearches(10);
   const { data: popularContent = [], isLoading: isLoadingPopular } = usePopularContent(20);
   const { data: categories = [], isLoading: isLoadingCategories } = useCategoryPreview();
-  const { data: playlists = [] } = usePlaylists();
+  const { data: user } = useUser();
+  
+  // Only fetch playlists if user is logged in
+  const isLoggedIn = !!user;
+  const { data: playlists = [] } = usePlaylists(isLoggedIn);
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
 
   return (
@@ -120,17 +125,17 @@ export default function Search() {
                     image={item.speaker.image || undefined}
                     onClick={() => router.push(`/content/${getContentSlug(item)}`)}
                     contentId={item.id}
-                    onAddToPlaylist={(playlistId) => {
+                    onAddToPlaylist={isLoggedIn ? (playlistId) => {
                       addContentToPlaylist({
                         playlistId,
                         contentId: item.id,
                       });
-                    }}
-                    onCreatePlaylist={(contentId) => {
+                    } : undefined}
+                    onCreatePlaylist={isLoggedIn ? (contentId) => {
                       setContentIdForPlaylist(contentId);
                       setIsCreateModalOpen(true);
-                    }}
-                    playlists={playlists}
+                    } : undefined}
+                    playlists={isLoggedIn ? playlists : undefined}
                   />
                 ))}
               </div>
@@ -160,17 +165,17 @@ export default function Search() {
                     image={item.speaker.image || undefined}
                     onClick={() => router.push(`/content/${getContentSlug(item)}`)}
                     contentId={item.id}
-                    onAddToPlaylist={(playlistId) => {
+                    onAddToPlaylist={isLoggedIn ? (playlistId) => {
                       addContentToPlaylist({
                         playlistId,
                         contentId: item.id,
                       });
-                    }}
-                    onCreatePlaylist={(contentId) => {
+                    } : undefined}
+                    onCreatePlaylist={isLoggedIn ? (contentId) => {
                       setContentIdForPlaylist(contentId);
                       setIsCreateModalOpen(true);
-                    }}
-                    playlists={playlists}
+                    } : undefined}
+                    playlists={isLoggedIn ? playlists : undefined}
                   />
                 ))}
               </div>

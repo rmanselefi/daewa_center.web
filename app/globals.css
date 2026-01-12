@@ -40,6 +40,40 @@
 
 :root {
   --radius: 0.75rem;
+  --background: hsl(40 15% 98%);
+  --foreground: hsl(220 15% 10%);
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(220 15% 10%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(220 15% 10%);
+  --primary: hsl(175 60% 45%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(40 80% 60%);
+  --secondary-foreground: hsl(220 15% 8%);
+  --muted: hsl(40 15% 95%);
+  --muted-foreground: hsl(220 10% 45%);
+  --accent: hsl(175 60% 35%);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(220 15% 90%);
+  --input: hsl(220 15% 90%);
+  --ring: hsl(175 60% 45%);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, hsl(175, 60%, 45%), hsl(175, 80%, 35%));
+  --gradient-secondary: linear-gradient(135deg, hsl(40, 80%, 60%), hsl(45, 85%, 55%));
+  --gradient-subtle: linear-gradient(180deg, hsl(40, 15%, 100%), hsl(40, 15%, 98%));
+
+  /* Shadows */
+  --shadow-glow: 0 0 30px hsl(175 60% 45% / 0.15);
+  --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.08);
+
+  /* Animations */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark {
   --background: oklch(0.1881 0.0089 264.33);
   --foreground: oklch(0.9424 0.0059 84.57);
   --card: oklch(0.2096 0.0109 264.31);
@@ -59,6 +93,19 @@
   --border: oklch(0.2909 0.018 264.24);
   --input: oklch(0.2909 0.018 264.24);
   --ring: oklch(0.7083 0.1139 186.5);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 
   --gradient-primary: linear-gradient(
     135deg,
@@ -79,43 +126,6 @@
   /* Shadows */
   --shadow-glow: 0 0 30px hsl(175 60% 45% / 0.2);
   --shadow-card: 0 4px 20px hsl(0 0% 0% / 0.4);
-
-  /* Animations */
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
 }
 
 @layer base {
@@ -124,5 +134,46 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out forwards;
+    opacity: 0;
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.4s ease-out forwards;
+  }
+
+  .delay-500 {
+    animation-delay: 500ms;
+  }
+
+  .delay-1000 {
+    animation-delay: 1000ms;
   }
 }

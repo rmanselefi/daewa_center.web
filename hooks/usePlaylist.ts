@@ -16,7 +16,7 @@ export const PLAYLIST_KEYS = {
   detail: (id: string) => [...PLAYLIST_KEYS.details(), id] as const,
 };
 
-export function usePlaylists() {
+export function usePlaylists(enabled: boolean = true) {
   return useQuery<Playlist[]>({
     queryKey: PLAYLIST_KEYS.list(),
     queryFn: async () => {
@@ -28,6 +28,7 @@ export function usePlaylists() {
         throw error;
       }
     },
+    enabled,
     retry: false,
   });
 }

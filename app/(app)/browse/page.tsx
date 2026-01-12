@@ -13,6 +13,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useInfiniteContent, useCategories, useSpeakers } from "@/hooks/useContent";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
+import { useUser } from "@/hooks/useUser";
 import { useI18n } from "@/stores/useI18nStore";
 import { getContentSlug } from "@/lib/utils";
 import LoginBanner from "@/components/common/LoginBanner";
@@ -41,7 +42,11 @@ export default function Browse() {
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: speakers = [], isLoading: isLoadingSpeakers } = useSpeakers();
-  const { data: playlists = [] } = usePlaylists();
+  const { data: user } = useUser();
+  
+  // Only fetch playlists if user is logged in
+  const isLoggedIn = !!user;
+  const { data: playlists = [] } = usePlaylists(isLoggedIn);
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
 
   const filters = {
@@ -182,20 +187,20 @@ export default function Browse() {
                   image={item.speaker.image || undefined}
                   onClick={() => router.push(`/content/${getContentSlug(item)}`)}
                   contentId={item.id}
-                  onAddToPlaylist={(playlistId) => {
+                  onAddToPlaylist={isLoggedIn ? (playlistId) => {
                     addContentToPlaylist({
                       playlistId,
                       contentId: item.id,
                     });
-                  }}
-                  onCreatePlaylist={(contentId) => {
+                  } : undefined}
+                  onCreatePlaylist={isLoggedIn ? (contentId) => {
                     // Set contentId first, then open modal to ensure it's available
                     if (contentId) {
                       setContentIdForPlaylist(contentId);
                     }
                     setIsCreateModalOpen(true);
-                  }}
-                  playlists={playlists}
+                  } : undefined}
+                  playlists={isLoggedIn ? playlists : undefined}
                 />
               ))}
             </div>

@@ -60,7 +60,20 @@ export const AuthService = {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         return null;
       }
-      // Only log non-401 errors
+      // Handle network errors (API down, no connection, timeout, etc.)
+      // Network errors don't have a response object, they have error.request instead
+      if (
+        axios.isAxiosError(error) &&
+        (!error.response && error.request) &&
+        (error.code === "ERR_NETWORK" ||
+          error.code === "ECONNABORTED" ||
+          error.code === "ETIMEDOUT" ||
+          error.message?.toLowerCase().includes("network error"))
+      ) {
+        console.warn("[AuthService.getUserMe] Network error - API may be down", error.message);
+        return null; // Return null for network errors, same as 401
+      }
+      // Only log other errors
       console.error("[AuthService.getUserMe] failed", error);
       rethrowApiError(error, "Failed to fetch user");
     }

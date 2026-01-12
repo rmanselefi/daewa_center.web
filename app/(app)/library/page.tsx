@@ -39,7 +39,8 @@ export default function Library() {
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDescription, setPlaylistDescription] = useState("");
 
-  const { data: playlists = [], isLoading: isLoadingPlaylists } = usePlaylists();
+  // Only fetch playlists if user is logged in (should always be true here due to redirect)
+  const { data: playlists = [], isLoading: isLoadingPlaylists } = usePlaylists(!!user);
   const { mutate: createPlaylist, isPending: isCreatingPlaylist } = useCreatePlaylist();
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
 

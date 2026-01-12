@@ -58,22 +58,11 @@ export function useUser() {
   return useQuery<UserResponse | null>({
     queryKey: USER_KEYS.detail("me"),
     queryFn: async () => {
-      try {
-        const response = await AuthService.getUserMe();
-        return response || null;
-      } catch (error) {
-        // Suppress 401 errors - they're expected when user is not logged in
-        if (error instanceof AxiosError && error.response?.status === 401) {
-          return null; // Return null for 401 errors instead of throwing
-        }
-        // Only log non-401 errors
-        if (error instanceof AxiosError && error.response?.status !== 401) {
-          console.error("getUserMe error:", error);
-        }
-        throw error; // Re-throw other errors
-      }
+      // getUserMe handles 401 and network errors gracefully by returning null
+      // No need for try-catch here since errors are handled in the service layer
+      return await AuthService.getUserMe();
     },
-    retry: false,
+    retry: false, // Don't retry - network errors and 401s are handled gracefully
   });
 }
 

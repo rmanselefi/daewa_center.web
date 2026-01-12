@@ -280,7 +280,7 @@ const Signup = () => {
                 {isPending ? (
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                    {t("creatingAccount") || "Creating account..."}
+                    {t("loading")}
                   </div>
                 ) : (
                   t("createAccount")
@@ -295,7 +295,7 @@ const Signup = () => {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-card px-2 text-muted-foreground">
-                  {t("orContinueWith") || "or continue with"}
+                  or continue with
                 </span>
               </div>
             </div>

@@ -395,7 +395,7 @@ const Signup = () => {
         {/* Content */}
         <div className="relative z-10 flex flex-col justify-center px-12">
           <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-6">
-            Daewa Zone
+            Ilmora
           </h1>
           <p className="text-xl text-muted-foreground mb-12 max-w-md">
             Join a community of learners seeking Islamic knowledge

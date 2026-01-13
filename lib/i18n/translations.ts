@@ -11,7 +11,7 @@ export const translations = {
     profile: "Profile",
     
     // Common
-    welcome: "Welcome to Daewa Zone",
+    welcome: "Welcome to Ilmora",
     welcomeDescription: "Your gateway to authentic Islamic knowledge. Stream lectures, Qur'an recitations, and spiritual guidance.",
     exploreContent: "Explore Content",
     featuredThisWeek: "Featured This Week",
@@ -87,7 +87,7 @@ export const translations = {
     profile: "መገለጫ",
     
     // Common
-    welcome: "ወደ ዳዋ ዞን እንኳን ደህና መጡ",
+    welcome: "ወደ ኢልሞራ እንኳን ደህና መጡ",
     welcomeDescription: "ወደ እውነተኛ የእስላም እውቀት መግቢያዎ. ንግግሮችን፣ የቁርአን ንባቦችን እና መንፈሳዊ መመሪያዎችን ያስተምሩ።",
     exploreContent: "ይዘት ያስሱ",
     featuredThisWeek: "በዚህ ሳምንት የተመረጡ",
@@ -163,7 +163,7 @@ export const translations = {
     profile: "الملف الشخصي",
     
     // Common
-    welcome: "مرحباً بك في داوة زون",
+    welcome: "مرحباً بك في إلمورا",
     welcomeDescription: "بوابتك إلى المعرفة الإسلامية الأصيلة. شغّل المحاضرات وتلاوات القرآن والإرشاد الروحي.",
     exploreContent: "استكشف المحتوى",
     featuredThisWeek: "المميز هذا الأسبوع",

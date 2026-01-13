@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { I18nInitializer } from "@/components/common/I18nInitializer";
 
 export const metadata: Metadata = {
-  title: "Daewa Zone",
-  description: "Daewa Zone is a platform for spiritual growth and development",
+  title: "Ilmora",
+  description: "Ilmora is a platform for spiritual growth and development",
 };
 
 export default function RootLayout({

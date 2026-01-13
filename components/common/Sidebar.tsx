@@ -30,7 +30,7 @@ export const SidebarContent = () => {
     <div className="p-6">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          Daewa Zone
+          Ilmora
         </h1>
         <div className="flex items-center gap-2">
           <LanguageSelector />

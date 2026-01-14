@@ -53,7 +53,6 @@ export default function Browse() {
 
   const quickFilters = [
     { id: "all", label: t("allCategories") || "All", icon: Sparkles },
-    { id: "quran", label: "Qur&apos;an", icon: BookOpen },
     { id: "lectures", label: t("courses") || "Lectures", icon: Mic },
     { id: "multilingual", label: "Multilingual", icon: Globe },
   ];

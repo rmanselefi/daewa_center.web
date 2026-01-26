@@ -4,10 +4,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   LibraryService,
   LibraryItem,
-  ContentItem,
   CheckLibraryStatusResponse,
 } from "@/services/library.service";
+import { ContentItem } from "@/services/content.service";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 export const LIBRARY_KEYS = {
   all: ["library"] as const,
@@ -83,7 +84,7 @@ export function useAddToLibrary() {
       qc.invalidateQueries({ queryKey: LIBRARY_KEYS.status(contentId) });
       toast.success("Added to library");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       const message = error.response?.data?.message || "Failed to add to library";
       toast.error(message);
     },
@@ -101,7 +102,7 @@ export function useRemoveFromLibrary() {
       qc.invalidateQueries({ queryKey: LIBRARY_KEYS.status(contentId) });
       toast.success("Removed from library");
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError<{ message?: string }>) => {
       const message = error.response?.data?.message || "Failed to remove from library";
       toast.error(message);
     },

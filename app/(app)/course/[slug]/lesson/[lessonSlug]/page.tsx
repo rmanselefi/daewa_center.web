@@ -12,6 +12,7 @@ import { useUser } from "@/hooks/useUser";
 import { getCourseSlug, createSlug } from "@/lib/utils";
 import { Lesson } from "@/services/course.service";
 import { useAudioPlayerStore } from "@/stores/useAudioPlayerStore";
+import { ContentItem } from "@/services/content.service";
 
 interface LessonDetailProps {
   params: Promise<{
@@ -76,15 +77,38 @@ export default function LessonDetail({ params }: LessonDetailProps) {
 
   // Handle play/pause
   const handlePlayPause = () => {
-    if (!currentLesson) return;
+    if (!currentLesson || !course) return;
 
-    // Convert lesson to audio track format if needed
-    const audioTrack = {
+    // Convert lesson to ContentItem format for audio player
+    const audioTrack: ContentItem = {
       id: currentLesson.id,
+      createdAt: currentLesson.createdAt,
+      updatedAt: currentLesson.updatedAt,
       title: currentLesson.lessonTitle,
+      description: null,
       audioUrl: currentLesson.contentUrl,
-      speaker: course?.speaker || { name: "", image: null, bio: null },
       duration: null,
+      isPublished: true,
+      isFeatured: false,
+      playCount: 0,
+      category: {
+        id: course.category.id,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        name: course.category.name,
+        slug: course.category.name.toLowerCase().replace(/\s+/g, "-"),
+        imageUrl: null,
+        description: "",
+      },
+      speaker: {
+        id: course.speaker.id,
+        createdAt: course.createdAt,
+        updatedAt: course.updatedAt,
+        name: course.speaker.name,
+        bio: "",
+        address: "",
+        image: null,
+      },
     };
 
     if (currentTrack?.id === currentLesson.id) {

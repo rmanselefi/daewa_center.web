@@ -4,12 +4,15 @@ import { use } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Play, Pause, Plus, Share2, Clock, Calendar } from "lucide-react";
+import { Play, Pause, Plus, Share2, Clock, Calendar, Check } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { useI18n } from "@/stores/useI18nStore";
-import { useContentBySlug } from "@/hooks/useContent";
+import { useContentBySlug, useContent } from "@/hooks/useContent";
 import { useAudioPlayerStore } from "@/stores/useAudioPlayerStore";
 import { getContentSlug } from "@/lib/utils";
+import { useCheckLibraryStatus, useAddToLibrary, useRemoveFromLibrary } from "@/hooks/useLibrary";
+import { useUser } from "@/hooks/useUser";
+import { useMemo } from "react";
 
 interface ContentDetailProps {
   params: Promise<{
@@ -21,36 +24,35 @@ export default function ContentDetail({ params }: ContentDetailProps) {
   const { slug } = use(params);
   const router = useRouter();
   const { t } = useI18n();
+  const { data: user } = useUser();
   // Fetch content by slug from URL
   const { data: content, isLoading } = useContentBySlug(slug);
   
-  // Hardcoded related content for now
-  const relatedContent = [
-    {
-      id: "1",
-      title: "Sample Related Content 1",
-      speaker: { name: "Speaker Name", image: null, bio: null },
-      duration: "10:30",
-    },
-    {
-      id: "2",
-      title: "Sample Related Content 2",
-      speaker: { name: "Speaker Name", image: null, bio: null },
-      duration: "15:45",
-    },
-    {
-      id: "3",
-      title: "Sample Related Content 3",
-      speaker: { name: "Speaker Name", image: null, bio: null },
-      duration: "20:20",
-    },
-    {
-      id: "4",
-      title: "Sample Related Content 4",
-      speaker: { name: "Speaker Name", image: null, bio: null },
-      duration: "12:10",
-    },
-  ];
+  // Fetch related content (same category, excluding current content)
+  const { data: relatedContentResponse, isLoading: isLoadingRelated } = useContent(
+    content?.category?.id
+      ? {
+          category: content.category.id,
+          limit: 5, // Fetch 5 to get 4 after filtering out current
+        }
+      : undefined
+  );
+  
+  // Filter out current content and limit to 4 items
+  const relatedContent = useMemo(() => {
+    if (!relatedContentResponse?.data || !content) return [];
+    return relatedContentResponse.data
+      .filter((item) => item.id !== content.id)
+      .slice(0, 4);
+  }, [relatedContentResponse, content]);
+  
+  // Check if content is in library
+  const { data: libraryStatus } = useCheckLibraryStatus(content?.id, !!user);
+  const isInLibrary = libraryStatus?.isInLibrary ?? false;
+  
+  // Library mutations
+  const { mutate: addToLibrary, isPending: isAdding } = useAddToLibrary();
+  const { mutate: removeFromLibrary, isPending: isRemoving } = useRemoveFromLibrary();
   
   const { currentTrack, isPlaying, setCurrentTrack, togglePlayPause } = useAudioPlayerStore();
   // Check if we're on the client to avoid hydration mismatch
@@ -75,6 +77,22 @@ export default function ContentDetail({ params }: ContentDetailProps) {
           useAudioPlayerStore.getState().play();
         }, 200);
       }
+    }
+  };
+
+  const handleLibraryToggle = () => {
+    if (!content) return;
+    
+    // Redirect to login if user is not logged in
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    
+    if (isInLibrary) {
+      removeFromLibrary(content.id);
+    } else {
+      addToLibrary(content.id);
     }
   };
 
@@ -180,9 +198,24 @@ export default function ContentDetail({ params }: ContentDetailProps) {
                 </>
               )}
             </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              <Plus className="w-5 h-5" />
-              {t("addToLibrary")}
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="gap-2"
+              onClick={handleLibraryToggle}
+              disabled={isAdding || isRemoving}
+            >
+              {isInLibrary ? (
+                <>
+                  <Check className="w-5 h-5" />
+                  {t("removeFromLibrary")}
+                </>
+              ) : (
+                <>
+                  <Plus className="w-5 h-5" />
+                  {t("addToLibrary")}
+                </>
+              )}
             </Button>
             <Button size="lg" variant="outline" className="gap-2">
               <Share2 className="w-5 h-5" />
@@ -215,7 +248,19 @@ export default function ContentDetail({ params }: ContentDetailProps) {
       )}
 
       {/* Related Content */}
-      {relatedContent.length > 0 && (
+      {isLoadingRelated ? (
+        <div>
+          <h2 className="text-2xl font-bold mb-6">{t("relatedContent")}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="aspect-square bg-muted rounded-lg animate-pulse"
+              />
+            ))}
+          </div>
+        </div>
+      ) : relatedContent.length > 0 ? (
         <div>
           <h2 className="text-2xl font-bold mb-6">{t("relatedContent")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -231,7 +276,7 @@ export default function ContentDetail({ params }: ContentDetailProps) {
             ))}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

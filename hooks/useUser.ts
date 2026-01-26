@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { AuthService, CreateUserReq, UserResponse } from "@/services/auth.service";
+import { AuthService, CreateUserReq, UserResponse, UserStats } from "@/services/auth.service";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -12,6 +12,7 @@ export const USER_KEYS = {
   list: (filters: string) => [...USER_KEYS.lists(), { filters }] as const,
   details: () => [...USER_KEYS.all, "detail"] as const,
   detail: (id: string) => [...USER_KEYS.details(), id] as const,
+  stats: () => [...USER_KEYS.all, "stats"] as const,
 };
 
 export function useLogin() {
@@ -81,3 +82,19 @@ export function useUserRegister() {
   });
 }
 
+export function useUserStats(enabled: boolean = true) {
+  return useQuery<UserStats>({
+    queryKey: USER_KEYS.stats(),
+    queryFn: async () => {
+      try {
+        const response = await AuthService.getUserStats();
+        return response;
+      } catch (error) {
+        console.error("getUserStats error:", error);
+        throw error;
+      }
+    },
+    enabled,
+    retry: false,
+  });
+}

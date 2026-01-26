@@ -46,17 +46,28 @@ export default function Home() {
     { value: "1M+", label: "Listeners", icon: Users },
   ];
 
-  // Generate particle positions once using lazy initializer to avoid calling Math.random during render
-  const [particles] = useState(() =>
-    Array.from({ length: 20 }, () => ({
+  // Generate particle positions only on client side to avoid hydration errors
+  const [particles] = useState<Array<{
+    width: number;
+    height: number;
+    left: number;
+    top: number;
+    animationDelay: number;
+    animationDuration: number;
+  }>>(() => {
+    // Only generate particles on client side
+    if (typeof window === "undefined") {
+      return [];
+    }
+    return Array.from({ length: 20 }, () => ({
       width: Math.random() * 10 + 5,
       height: Math.random() * 10 + 5,
       left: Math.random() * 100,
       top: Math.random() * 100,
       animationDelay: Math.random() * 3,
       animationDuration: Math.random() * 3 + 2,
-    }))
-  );
+    }));
+  });
 
   return (
     <div className="min-h-screen">
@@ -68,23 +79,26 @@ export default function Home() {
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
 
-        {/* Floating particles */}
-        <div className="absolute inset-0 overflow-hidden">
-          {particles.map((particle, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full bg-primary/20 animate-pulse"
-              style={{
-                width: `${particle.width}px`,
-                height: `${particle.height}px`,
-                left: `${particle.left}%`,
-                top: `${particle.top}%`,
-                animationDelay: `${particle.animationDelay}s`,
-                animationDuration: `${particle.animationDuration}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles - only render on client to prevent hydration mismatch */}
+        {particles.length > 0 && (
+          <div className="absolute inset-0 overflow-hidden" suppressHydrationWarning>
+            {particles.map((particle, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full bg-primary/20 animate-pulse"
+                suppressHydrationWarning
+                style={{
+                  width: `${particle.width}px`,
+                  height: `${particle.height}px`,
+                  left: `${particle.left}%`,
+                  top: `${particle.top}%`,
+                  animationDelay: `${particle.animationDelay}s`,
+                  animationDuration: `${particle.animationDuration}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Radial glow effects */}
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />

@@ -15,6 +15,13 @@ export type CreateUserReq = {
   fullname: string;
 };
 
+export type UserStats = {
+  lecturesCompleted: number;
+  totalTimeHours: number;
+  totalTimeFormatted: string;
+  playlistsCount: number;
+};
+
 type ApiErrorData = { message?: string };
 
 function rethrowApiError(error: unknown, fallbackMessage: string): never {
@@ -86,6 +93,16 @@ export const AuthService = {
     } catch (error) {
       console.error("[AuthService.createUser] failed", error);
       rethrowApiError(error, "Failed to create user");
+    }
+  },
+
+  async getUserStats(): Promise<UserStats> {
+    try {
+      const response = await api.get("/api/v1/user/me/stats");
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.getUserStats] failed", error);
+      rethrowApiError(error, "Failed to fetch user stats");
     }
   },
 };

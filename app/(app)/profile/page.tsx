@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Settings, Bell, Download, HelpCircle, LogOut } from "lucide-react";
-import { useUser, useLogout } from "@/hooks/useUser";
+import { useUser, useLogout, useUserStats } from "@/hooks/useUser";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { UserResponse } from "@/services/auth.service";
@@ -13,12 +13,14 @@ export default function Profile() {
   const { data: user, isLoading } = useUser();
   const typedUser = user as UserResponse | null | undefined;
   const { mutate: logout } = useLogout();
+  const { data: stats, isLoading: isLoadingStats } = useUserStats(!!user);
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
     }
   }, [user, isLoading, router]);
+
 
   if (isLoading) return null;
   return (
@@ -53,20 +55,37 @@ export default function Profile() {
       {/* Listening Stats */}
       <Card className="p-6 mb-8">
         <h3 className="text-xl font-semibold mb-4">Your Listening Stats</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">127</p>
-            <p className="text-sm text-muted-foreground">Lectures Completed</p>
+        {isLoadingStats ? (
+          <div className="grid grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="text-center">
+                <div className="h-10 bg-muted rounded animate-pulse mb-2" />
+                <div className="h-4 bg-muted rounded animate-pulse w-24 mx-auto" />
+              </div>
+            ))}
           </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">45h</p>
-            <p className="text-sm text-muted-foreground">Total Time</p>
+        ) : (
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-primary">
+                {stats?.lecturesCompleted ?? 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Lectures Completed</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-primary">
+                {stats?.totalTimeFormatted ?? "0m"}
+              </p>
+              <p className="text-sm text-muted-foreground">Total Time</p>
+            </div>
+            <div className="text-center">
+              <p className="text-3xl font-bold text-primary">
+                {stats?.playlistsCount ?? 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Playlists</p>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-3xl font-bold text-primary">23</p>
-            <p className="text-sm text-muted-foreground">Playlists</p>
-          </div>
-        </div>
+        )}
       </Card>
 
       {/* Settings */}

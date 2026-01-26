@@ -25,3 +25,37 @@ export function useCourses() {
   });
 }
 
+export function useCourseById(id: string) {
+  return useQuery<Course>({
+    queryKey: COURSE_KEYS.byId(id),
+    queryFn: async () => {
+      try {
+        const response = await CourseService.getById(id);
+        return response;
+      } catch (error) {
+        console.error("getById course error:", error);
+        throw error;
+      }
+    },
+    enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useCourseBySlug(slug: string) {
+  return useQuery<Course>({
+    queryKey: [...COURSE_KEYS.all, "bySlug", slug],
+    queryFn: async () => {
+      try {
+        const response = await CourseService.getBySlug(slug);
+        return response;
+      } catch (error) {
+        console.error("getBySlug course error:", error);
+        throw error;
+      }
+    },
+    enabled: !!slug,
+    retry: false,
+  });
+}
+

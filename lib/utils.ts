@@ -31,3 +31,8 @@ export function formatTime(seconds: number): string {
 export function getContentSlug(content: { slug?: string; title: string }): string {
   return content.slug || createSlug(content.title);
 }
+
+// Get slug from course item (generate from title)
+export function getCourseSlug(course: { title: string }): string {
+  return createSlug(course.title);
+}

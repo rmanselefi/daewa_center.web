@@ -16,25 +16,20 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { createSlug } from "@/lib/utils";
 
 import { useUser } from "@/hooks/useUser";
 import { usePlaylists, useCreatePlaylist, useAddContentToPlaylist } from "@/hooks/usePlaylist";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
+import { useLibraryContent } from "@/hooks/useLibrary";
+import { useRecentlyPlayed } from "@/hooks/usePlayHistory";
 import { useEffect } from "react";
+import { getContentSlug } from "@/lib/utils";
 
 export default function Library() {
   const router = useRouter();
   const { data: user, isLoading } = useUser();
 
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, isLoading, router]);
-
-  if (isLoading) return null;
-  
+  // All hooks must be called before any conditional returns
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [playlistName, setPlaylistName] = useState("");
   const [playlistDescription, setPlaylistDescription] = useState("");
@@ -43,42 +38,21 @@ export default function Library() {
   const { data: playlists = [], isLoading: isLoadingPlaylists } = usePlaylists(!!user);
   const { mutate: createPlaylist, isPending: isCreatingPlaylist } = useCreatePlaylist();
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
+  
+  // Fetch library content
+  const { data: savedContent = [], isLoading: isLoadingLibrary } = useLibraryContent(!!user);
+  
+  // Fetch recently played content (limit 5)
+  const { data: recentlyPlayed = [], isLoading: isLoadingRecentlyPlayed } = useRecentlyPlayed(5, !!user);
 
-  const savedContent = [
-    {
-      id: "1",
-      title: "The Prophetic Way",
-      speaker: "Sheikh Omar Suleiman",
-      duration: "45:32",
-    },
-    {
-      id: "2",
-      title: "Understanding Tawheed",
-      speaker: "Imam Yasir Qadhi",
-      duration: "52:18",
-    },
-    {
-      id: "3",
-      title: "Stories of the Sahaba",
-      speaker: "Mufti Menk",
-      duration: "38:45",
-    },
-  ];
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, isLoading, router]);
 
-  const recentlyPlayed = [
-    {
-      id: "5",
-      title: "The Power of Dua",
-      speaker: "Nouman Ali Khan",
-      duration: "28:30",
-    },
-    {
-      id: "6",
-      title: "Patience in Hardship",
-      speaker: "Sheikh Ahmad Al-Khalil",
-      duration: "35:42",
-    },
-  ];
+  // Conditional return after all hooks
+  if (isLoading) return null;
 
   const handleCreatePlaylist = () => {
     if (!playlistName.trim()) return;
@@ -110,49 +84,81 @@ export default function Library() {
         </TabsList>
 
         <TabsContent value="saved" className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {savedContent.map((item) => (
-              <ContentCard
-                key={item.id}
-                title={item.title}
-                speaker={item.speaker}
-                duration={item.duration}
-                onClick={() => router.push(`/content/${createSlug(item.title)}`)}
-                contentId={item.id}
-                onAddToPlaylist={(playlistId) => {
-                  addContentToPlaylist({
-                    playlistId,
-                    contentId: item.id,
-                  });
-                }}
-                onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
-                playlists={playlists}
-              />
-            ))}
-          </div>
+          {isLoadingLibrary ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-muted rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : savedContent.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {savedContent.map((item) => (
+                <ContentCard
+                  key={item.id}
+                  title={item.title}
+                  speaker={item.speaker.name}
+                  duration={item.duration || "--:--"}
+                  image={item.speaker.image || undefined}
+                  onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                  contentId={item.id}
+                  onAddToPlaylist={(playlistId) => {
+                    addContentToPlaylist({
+                      playlistId,
+                      contentId: item.id,
+                    });
+                  }}
+                  onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
+                  playlists={playlists}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              No saved content yet. Start saving your favorite lectures!
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="recent" className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {recentlyPlayed.map((item) => (
-              <ContentCard
-                key={item.id}
-                title={item.title}
-                speaker={item.speaker}
-                duration={item.duration}
-                onClick={() => router.push(`/content/${createSlug(item.title)}`)}
-                contentId={item.id}
-                onAddToPlaylist={(playlistId) => {
-                  addContentToPlaylist({
-                    playlistId,
-                    contentId: item.id,
-                  });
-                }}
-                onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
-                playlists={playlists}
-              />
-            ))}
-          </div>
+          {isLoadingRecentlyPlayed ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="aspect-square bg-muted rounded-lg animate-pulse"
+                />
+              ))}
+            </div>
+          ) : recentlyPlayed.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {recentlyPlayed.map((item) => (
+                <ContentCard
+                  key={item.id}
+                  title={item.title}
+                  speaker={item.speaker.name}
+                  duration={item.duration || "--:--"}
+                  image={item.speaker.image || undefined}
+                  onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                  contentId={item.id}
+                  onAddToPlaylist={(playlistId) => {
+                    addContentToPlaylist({
+                      playlistId,
+                      contentId: item.id,
+                    });
+                  }}
+                  onCreatePlaylist={(contentId) => setIsDialogOpen(true)}
+                  playlists={playlists}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              No recently played content yet.
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="playlists" className="space-y-6">

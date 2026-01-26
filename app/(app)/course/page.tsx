@@ -1,11 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Clock, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useUser } from "@/hooks/useUser";
 import { useCourses } from "@/hooks/useCourse";
 import { useEffect } from "react";
+import { getCourseSlug } from "@/lib/utils";
 
 export default function Courses() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function Courses() {
               <div
                 key={course.id}
                 className="group rounded-xl border border-border bg-card overflow-hidden hover:shadow-lg transition-all cursor-pointer"
-                onClick={() => router.push(`/course/${course.id}`)}
+                onClick={() => router.push(`/course/${getCourseSlug(course)}-${course.id}`)}
               >
                 <div className="aspect-video bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center relative overflow-hidden">
                   {course.imageUrl ? (

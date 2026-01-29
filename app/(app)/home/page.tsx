@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Sparkles, BookOpen, Mic2, Users, Heart, Star, Headphones } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
@@ -46,28 +46,33 @@ export default function Home() {
     { value: "1M+", label: "Listeners", icon: Users },
   ];
 
-  // Generate particle positions only on client side to avoid hydration errors
-  const [particles] = useState<Array<{
+  // Generate particle positions only on client side after mount
+  const [particles, setParticles] = useState<Array<{
     width: number;
     height: number;
     left: number;
     top: number;
     animationDelay: number;
     animationDuration: number;
-  }>>(() => {
-    // Only generate particles on client side
-    if (typeof window === "undefined") {
-      return [];
+  }>>([]);
+
+  useEffect(() => {
+    // Generate particles after mount to avoid hydration mismatch.
+    // Use requestAnimationFrame so setState isn't called synchronously in the effect body.
+    if (typeof window !== "undefined") {
+      const generatedParticles = Array.from({ length: 20 }, () => ({
+        width: Math.random() * 10 + 5,
+        height: Math.random() * 10 + 5,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        animationDelay: Math.random() * 3,
+        animationDuration: Math.random() * 3 + 2,
+      }));
+      window.requestAnimationFrame(() => {
+        setParticles(generatedParticles);
+      });
     }
-    return Array.from({ length: 20 }, () => ({
-      width: Math.random() * 10 + 5,
-      height: Math.random() * 10 + 5,
-      left: Math.random() * 100,
-      top: Math.random() * 100,
-      animationDelay: Math.random() * 3,
-      animationDuration: Math.random() * 3 + 2,
-    }));
-  });
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -79,14 +84,13 @@ export default function Home() {
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10" />
 
-        {/* Floating particles - only render on client to prevent hydration mismatch */}
+        {/* Floating particles - only render after particles are generated to prevent hydration mismatch */}
         {particles.length > 0 && (
-          <div className="absolute inset-0 overflow-hidden" suppressHydrationWarning>
+          <div className="absolute inset-0 overflow-hidden">
             {particles.map((particle, i) => (
               <div
                 key={i}
                 className="absolute rounded-full bg-primary/20 animate-pulse"
-                suppressHydrationWarning
                 style={{
                   width: `${particle.width}px`,
                   height: `${particle.height}px`,

@@ -13,6 +13,7 @@ export type CreateUserReq = {
   email: string;
   password: string;
   fullname: string;
+  phone: string;
 };
 
 export type UserStats = {
@@ -86,9 +87,9 @@ export const AuthService = {
     }
   },
 
-  async createUser({ email, password, fullname }: CreateUserReq) {
+  async createUser({ email, password, fullname, phone }: CreateUserReq) {
     try {
-      const response = await api.post("/api/v1/user", { email, password, fullname });
+      const response = await api.post("/api/v1/user", { email, password, fullname, phone });
       return response.data;
     } catch (error) {
       console.error("[AuthService.createUser] failed", error);

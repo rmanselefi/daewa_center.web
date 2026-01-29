@@ -1,12 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { CourseService, Course } from "@/services/course.service";
+import { CourseService, Course, LessonWithProgress } from "@/services/course.service";
 
 export const COURSE_KEYS = {
   all: ["course"] as const,
   list: () => [...COURSE_KEYS.all, "list"] as const,
   byId: (id: string) => [...COURSE_KEYS.all, "byId", id] as const,
+  lessonsWithProgress: (courseId: string) => [...COURSE_KEYS.all, "lessonsWithProgress", courseId] as const,
 };
 
 export function useCourses() {
@@ -55,6 +56,23 @@ export function useCourseBySlug(slug: string) {
       }
     },
     enabled: !!slug,
+    retry: false,
+  });
+}
+
+export function useLessonsWithProgress(courseId: string, enabled: boolean = true) {
+  return useQuery<LessonWithProgress[]>({
+    queryKey: COURSE_KEYS.lessonsWithProgress(courseId),
+    queryFn: async () => {
+      try {
+        const response = await CourseService.getLessonsWithProgress(courseId);
+        return response || [];
+      } catch (error) {
+        console.error("getLessonsWithProgress error:", error);
+        throw error;
+      }
+    },
+    enabled: enabled && !!courseId,
     retry: false,
   });
 }

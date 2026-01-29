@@ -16,11 +16,12 @@ import { useUserRegister } from "@/hooks/useUser";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useI18n } from "@/stores/useI18nStore";
-import { Eye, EyeOff, Mail, Lock, User, Check, X, Headphones, BookOpen, Users, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Check, X, Headphones, BookOpen, Users, Sparkles, Phone } from "lucide-react";
 
 const Signup = () => {
   const [fullname, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -67,6 +68,7 @@ const Signup = () => {
         fullname,
         email,
         password,
+        phone: phone.trim(),
       },
       {
         onSuccess: () => {
@@ -153,6 +155,31 @@ const Signup = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setFocusedField("email")}
+                    onBlur={() => setFocusedField(null)}
+                    className="pl-11 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone Field */}
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium">
+                  {t("phone") || "Phone"}
+                </Label>
+                <div className="relative">
+                  <Phone
+                    className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${
+                      focusedField === "phone" ? "text-primary" : "text-muted-foreground"
+                    }`}
+                  />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder={t("phonePlaceholder") || "+1234567890"}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    onFocus={() => setFocusedField("phone")}
                     onBlur={() => setFocusedField(null)}
                     className="pl-11 h-12 transition-all duration-200 focus:ring-2 focus:ring-primary/20"
                     required
@@ -275,7 +302,7 @@ const Signup = () => {
               <Button
                 type="submit"
                 className="w-full h-12 text-base font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                disabled={isPending || password !== confirmPassword || !password}
+                disabled={isPending || password !== confirmPassword || !password || !phone.trim()}
               >
                 {isPending ? (
                   <div className="flex items-center gap-2">

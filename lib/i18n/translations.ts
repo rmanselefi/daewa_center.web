@@ -77,6 +77,18 @@ export const translations = {
     userCreatedSuccess: "User created successfully",
     failedToCreateUser: "Failed to create user",
     emailPlaceholder: "your@email.com",
+    phone: "Phone",
+    phonePlaceholder: "+1234567890",
+
+    // Course detail
+    backToCourses: "Back to Courses",
+    courseLessons: "lessons",
+    aboutCourse: "About this course",
+    courseContent: "Course content",
+    startCourse: "Start Course",
+    continueCourse: "Continue Course",
+    preview: "Preview",
+    markComplete: "Mark complete",
   },
   am: {
     // Navigation
@@ -154,6 +166,18 @@ export const translations = {
     userCreatedSuccess: "ተጠቃሚ በተሳካ ሁኔታ ተፈጥሯል",
     failedToCreateUser: "ተጠቃሚ መፍጠር አልተሳካም",
     emailPlaceholder: "your@email.com",
+    phone: "ስልክ",
+    phonePlaceholder: "+251912345678",
+
+    // Course detail
+    backToCourses: "ወደ ኮርሶች ተመለስ",
+    courseLessons: "ትምህርቶች",
+    aboutCourse: "ስለ ይህ ኮርስ",
+    courseContent: "የኮርስ ይዘት",
+    startCourse: "ኮርስ ጀምር",
+    continueCourse: "ቀጥል",
+    preview: "ቅድመ እይታ",
+    markComplete: "እንደተጠናቀቀ ምልክት አድርግ",
   },
   ar: {
     // Navigation
@@ -231,6 +255,18 @@ export const translations = {
     userCreatedSuccess: "تم إنشاء المستخدم بنجاح",
     failedToCreateUser: "فشل في إنشاء المستخدم",
     emailPlaceholder: "your@email.com",
+    phone: "الهاتف",
+    phonePlaceholder: "+966501234567",
+
+    // Course detail
+    backToCourses: "العودة إلى الدورات",
+    courseLessons: "دروس",
+    aboutCourse: "حول هذه الدورة",
+    courseContent: "محتوى الدورة",
+    startCourse: "ابدأ الدورة",
+    continueCourse: "متابعة",
+    preview: "معاينة",
+    markComplete: "تحديد كمكتمل",
   },
 } as const;
 

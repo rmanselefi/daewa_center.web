@@ -23,8 +23,10 @@ export default function Courses() {
   
   if (!user) return null;
 
-  // Filter only published courses
-  const publishedCourses = courses.filter(course => course.isPublished);
+  // Filter only published courses that have lessons
+  const publishedCourses = courses.filter(
+    course => course.isPublished && course.lessons && course.lessons.length > 0
+  );
 
   const categories = ["All", "Beginner", "Intermediate", "Advanced"];
 

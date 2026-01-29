@@ -12,6 +12,25 @@ export type Lesson = {
   isPreview: boolean;
 };
 
+export type LessonProgress = {
+  listenedSeconds: number;
+  isCompleted: boolean;
+  lastListenedAt: string | null;
+};
+
+export type LessonWithProgress = {
+  id: string;
+  lessonTitle: string;
+  contentUrl: string;
+  orderIndex: number;
+  isPreview: boolean;
+  createdAt: string;
+  updatedAt: string;
+  progress: LessonProgress;
+  /** Duration in seconds (int), when provided by API. May be number or string. */
+  duration?: number | string;
+};
+
 export type Course = {
   id: string;
   title: string;
@@ -85,6 +104,16 @@ export const CourseService = {
     
     // Now use the UUID to fetch the course (API always uses UUID)
     return this.getById(found.id);
+  },
+
+  async getLessonsWithProgress(courseId: string): Promise<LessonWithProgress[]> {
+    try {
+      const response = await api.get(`/course-lesson/course/${courseId}/with-progress`);
+      return response.data || [];
+    } catch (error) {
+      console.error("[CourseService.getLessonsWithProgress] failed", error);
+      rethrowApiError(error, "Failed to fetch lessons with progress");
+    }
   },
 };
 

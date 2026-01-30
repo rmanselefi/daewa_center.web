@@ -5,6 +5,7 @@ export type UserResponse = {
   id: string;
   email?: string | null;
   fullname?: string | null;
+  phone?: string | null;
   photoURL?: string | null;
   profile?: Record<string, unknown> | null;
 };
@@ -14,6 +15,17 @@ export type CreateUserReq = {
   password: string;
   fullname: string;
   phone: string;
+};
+
+export type UpdateProfileReq = {
+  fullname?: string | null;
+  email?: string | null;
+  phone?: string | null;
+};
+
+export type ChangePasswordDto = {
+  currentPassword: string;
+  newPassword: string; // at least 6 characters
 };
 
 export type UserStats = {
@@ -104,6 +116,37 @@ export const AuthService = {
     } catch (error) {
       console.error("[AuthService.getUserStats] failed", error);
       rethrowApiError(error, "Failed to fetch user stats");
+    }
+  },
+
+  async updateProfile(data: UpdateProfileReq): Promise<UserResponse> {
+    try {
+      const response = await api.patch("/api/v1/user/me", data);
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.updateProfile] failed", error);
+      rethrowApiError(error, "Failed to update profile");
+    }
+  },
+
+  async uploadProfileImage(file: File): Promise<UserResponse> {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await api.post("/user/me/profile-image", formData);
+      return response.data;
+    } catch (error) {
+      console.error("[AuthService.uploadProfileImage] failed", error);
+      rethrowApiError(error, "Failed to upload profile image");
+    }
+  },
+
+  async changePassword(data: ChangePasswordDto): Promise<void> {
+    try {
+      await api.put("/user/me/password", data);
+    } catch (error) {
+      console.error("[AuthService.changePassword] failed", error);
+      rethrowApiError(error, "Failed to change password");
     }
   },
 };

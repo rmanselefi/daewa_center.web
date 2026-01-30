@@ -36,3 +36,15 @@ export function getContentSlug(content: { slug?: string; title: string }): strin
 export function getCourseSlug(course: { title: string }): string {
   return createSlug(course.title);
 }
+
+// Get slug from playlist (name_slug-id for URL, API uses id)
+export function getPlaylistSlug(playlist: { id: string; name: string }): string {
+  return `${createSlug(playlist.name)}-${playlist.id}`;
+}
+
+// Parse playlist id from URL slug (slug is "name_slug-uuid")
+export function parsePlaylistIdFromSlug(slug: string): string | null {
+  const uuidPattern = /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+  const match = slug.match(uuidPattern);
+  return match ? match[1] : null;
+}

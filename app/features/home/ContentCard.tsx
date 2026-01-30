@@ -45,26 +45,26 @@ export const ContentCard = ({
           <img src={image} alt={title} className="w-full h-full object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-            <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-              <Play className="w-8 h-8 text-primary" />
+            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+              <Play className="w-5 h-5 text-primary" />
             </div>
           </div>
         )}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
           <Button
             size="icon"
-            className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90"
+            className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90"
           >
-            <Play className="w-6 h-6" />
+            <Play className="w-5 h-5" />
           </Button>
         </div>
       </div>
-      <div className="p-4">
-        <div className="flex justify-between items-start gap-2">
+      <div className="p-3">
+        <div className="flex justify-between items-start gap-1.5">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate mb-1">{title}</h3>
-            <p className="text-sm text-muted-foreground truncate">{speaker}</p>
-            <p className="text-xs text-muted-foreground mt-1">{duration}</p>
+            <h3 className="text-sm font-semibold truncate mb-0.5">{title}</h3>
+            <p className="text-xs text-muted-foreground truncate">{speaker}</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">{duration}</p>
           </div>
           {(onAddToPlaylist || onCreatePlaylist) && (
             <DropdownMenu>
@@ -72,10 +72,10 @@ export const ContentCard = ({
                 <Button
                   size="icon"
                   variant="outline"
-                  className="h-9 w-9 shrink-0 hover:bg-accent"
+                  className="h-7 w-7 shrink-0 hover:bg-accent"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <ListPlus className="h-5 w-5" />
+                  <ListPlus className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48 bg-popover z-50">

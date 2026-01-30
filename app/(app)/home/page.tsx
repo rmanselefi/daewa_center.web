@@ -5,6 +5,7 @@ import { ChevronRight, Sparkles, BookOpen, Mic2, Users, Heart, Star, Headphones 
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { useRouter } from "next/navigation";
 import LoginBanner from "@/components/common/LoginBanner";
+import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import { useFeaturedContent, useCategoryPreview, useTrendingContent } from "@/hooks/useContent";
 import { getContentSlug } from "@/lib/utils";
 import { useI18n } from "@/stores/useI18nStore";
@@ -21,6 +22,8 @@ export default function Home() {
   const isLoggedIn = !!user;
   const { data: playlists = [] } = usePlaylists(isLoggedIn);
   const { mutate: addContentToPlaylist } = useAddContentToPlaylist();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [contentIdForPlaylist, setContentIdForPlaylist] = useState<string | undefined>();
 
   const categoryIcons = [
     BookOpen,
@@ -116,7 +119,7 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto px-4 relative z-10 py-16">
-          <div className="max-w-3xl animate-fade-in">
+          <div className="max-w-3xl mx-auto text-center animate-fade-in">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">Your Spiritual Journey Starts Here</span>
@@ -129,11 +132,11 @@ export default function Home() {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
               {t("welcomeDescription")}
             </p>
 
-            <div className="flex flex-wrap gap-4 mb-12">
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:scale-105"
@@ -154,7 +157,7 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {stats.map((stat, index) => (
                 <div
                   key={index}
@@ -187,7 +190,7 @@ export default function Home() {
           </Button>
         </div>
         {isLoadingFeatured ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
@@ -196,7 +199,7 @@ export default function Home() {
             ))}
           </div>
         ) : featured.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {featured.map((item) => (
               <ContentCard
                 key={item.id}
@@ -211,6 +214,10 @@ export default function Home() {
                     playlistId,
                     contentId: item.id,
                   });
+                } : undefined}
+                onCreatePlaylist={isLoggedIn ? (contentId) => {
+                  setContentIdForPlaylist(contentId);
+                  setIsCreateModalOpen(true);
                 } : undefined}
                 playlists={isLoggedIn ? playlists : undefined}
               />
@@ -235,7 +242,7 @@ export default function Home() {
           </Button>
         </div>
         {isLoadingTrending ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {[...Array(4)].map((_, i) => (
               <div
                 key={i}
@@ -244,7 +251,7 @@ export default function Home() {
             ))}
           </div>
         ) : trending.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {trending.map((item) => (
               <ContentCard
                 key={item.id}
@@ -259,6 +266,10 @@ export default function Home() {
                     playlistId,
                     contentId: item.id,
                   });
+                } : undefined}
+                onCreatePlaylist={isLoggedIn ? (contentId) => {
+                  setContentIdForPlaylist(contentId);
+                  setIsCreateModalOpen(true);
                 } : undefined}
                 playlists={isLoggedIn ? playlists : undefined}
               />
@@ -276,7 +287,7 @@ export default function Home() {
         <h2 className="text-2xl font-bold mb-2">{t("browseByCategory")}</h2>
         <p className="text-muted-foreground mb-8">Find content that speaks to your heart</p>
         {isLoadingCategories ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -285,7 +296,7 @@ export default function Home() {
             ))}
           </div>
         ) : categories.length > 0 ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             {categories.map((category, index) => {
               const Icon = categoryIcons[index % categoryIcons.length];
               const color = categoryColors[index % categoryColors.length];
@@ -318,6 +329,15 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      <CreatePlaylistModal
+        open={isCreateModalOpen}
+        onOpenChange={(open) => {
+          setIsCreateModalOpen(open);
+          if (!open) setContentIdForPlaylist(undefined);
+        }}
+        contentId={contentIdForPlaylist}
+      />
     </div>
   );
 }

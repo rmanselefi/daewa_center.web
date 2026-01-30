@@ -52,7 +52,12 @@ export const translations = {
     searchResults: "Search Results",
     popularContent: "Popular Content",
     browseByTopic: "Browse by Topic",
-    
+    searchDiscoverKnowledge: "Discover Knowledge",
+    searchSubtitle: "Find lectures, speakers, and topics that inspire you",
+    searchPopularSubtitle: "What the community is listening to",
+    searchResultsFor: "Showing results for",
+    searchBrowseByTopicSubtitle: "Find content that speaks to your heart",
+
     // Auth
     signIn: "Sign In",
     signUp: "Sign Up",
@@ -80,6 +85,13 @@ export const translations = {
     phone: "Phone",
     phonePlaceholder: "+1234567890",
 
+    // Courses list
+    coursesTitle: "Courses",
+    coursesSubtitle: "Structured learning paths to deepen your Islamic knowledge",
+    coursesAll: "All",
+    coursesProgress: "Progress",
+    coursesLoadMore: "Load More Courses",
+
     // Course detail
     backToCourses: "Back to Courses",
     courseLessons: "lessons",
@@ -89,6 +101,23 @@ export const translations = {
     continueCourse: "Continue Course",
     preview: "Preview",
     markComplete: "Mark complete",
+
+    // Library
+    libraryTitle: "Your Library",
+    librarySubtitle: "Saved content, recently played, and your playlists in one place.",
+    libraryYourCollection: "Your Collection",
+    librarySaved: "Saved",
+    libraryRecentlyPlayed: "Recently Played",
+    libraryPlaylistsTab: "Playlists",
+    libraryYourPlaylists: "Your Playlists",
+    libraryOrganizePlaylists: "Organize your favorite lectures",
+    libraryCreatePlaylist: "Create Playlist",
+    libraryNoSavedContent: "No saved content yet. Start saving your favorite lectures!",
+    libraryNoRecentlyPlayed: "No recently played content yet.",
+    libraryNoPlaylists: "No playlists yet. Create your first playlist!",
+    libraryCreatePlaylistTitle: "Create New Playlist",
+    libraryCreatePlaylistDescription: "Give your playlist a name and optional description.",
+    libraryLectures: "lectures",
   },
   am: {
     // Navigation
@@ -141,7 +170,12 @@ export const translations = {
     searchResults: "የፍለጋ ውጤቶች",
     popularContent: "ታዋቂ ይዘት",
     browseByTopic: "በርዕስ ይሂዱ",
-    
+    searchDiscoverKnowledge: "እውቀት ይፈልጉ",
+    searchSubtitle: "የሚያስተውሉዎትን ንግግሮች፣ አዋላጆች እና ርዕሶች ያግኙ",
+    searchPopularSubtitle: "ማህበረሰቡ የሚያዳምጠው",
+    searchResultsFor: "ውጤቶች ለ",
+    searchBrowseByTopicSubtitle: "በልብዎ የሚነግር ይዘት ያግኙ",
+
     // Auth
     signIn: "ግባ",
     signUp: "ተመዝግብ",
@@ -169,6 +203,13 @@ export const translations = {
     phone: "ስልክ",
     phonePlaceholder: "+251912345678",
 
+    // Courses list
+    coursesTitle: "ኮርሶች",
+    coursesSubtitle: "የእስላም እውቀትዎን ለማስቀደም የተዋቀሩ የትምህርት መንገዶች",
+    coursesAll: "ሁሉም",
+    coursesProgress: "እድገት",
+    coursesLoadMore: "ተጨማሪ ኮርሶች ጫን",
+
     // Course detail
     backToCourses: "ወደ ኮርሶች ተመለስ",
     courseLessons: "ትምህርቶች",
@@ -178,6 +219,23 @@ export const translations = {
     continueCourse: "ቀጥል",
     preview: "ቅድመ እይታ",
     markComplete: "እንደተጠናቀቀ ምልክት አድርግ",
+
+    // Library
+    libraryTitle: "መጽሐፍትዎ",
+    librarySubtitle: "የተቀመጡ ይዘቶች፣ በቅርብ ጊዜ የተጫወቱ እና የመዝግብ ዝርዝሮችዎ በአንድ ቦታ።",
+    libraryYourCollection: "ስብስብዎ",
+    librarySaved: "የተቀመጠ",
+    libraryRecentlyPlayed: "በቅርብ ጊዜ የተጫወተ",
+    libraryPlaylistsTab: "የመዝግብ ዝርዝሮች",
+    libraryYourPlaylists: "የመዝግብ ዝርዝሮችዎ",
+    libraryOrganizePlaylists: "የሚወዷቸውን ንግግሮች ያስተዳድሩ",
+    libraryCreatePlaylist: "የመዝግብ ዝርዝር ፍጠር",
+    libraryNoSavedContent: "ገና የተቀመጠ ይዘት የለም። የሚወዷቸውን ንግግሮች ማስቀጠል ይጀምሩ!",
+    libraryNoRecentlyPlayed: "ገና በቅርብ ጊዜ የተጫወተ ይዘት የለም።",
+    libraryNoPlaylists: "ገና የመዝግብ ዝርዝሮች የሉም። የመጀመሪያ የመዝግብ ዝርዝርዎን ይፍጠሩ!",
+    libraryCreatePlaylistTitle: "አዲስ የመዝግብ ዝርዝር ፍጠር",
+    libraryCreatePlaylistDescription: "ለየመዝግብ ዝርዝርዎ ስም እና አማራጭ መግለጫ ይስጡ።",
+    libraryLectures: "ንግግሮች",
   },
   ar: {
     // Navigation
@@ -230,7 +288,12 @@ export const translations = {
     searchResults: "نتائج البحث",
     popularContent: "المحتوى الشائع",
     browseByTopic: "تصفح حسب الموضوع",
-    
+    searchDiscoverKnowledge: "اكتشف المعرفة",
+    searchSubtitle: "اعثر على محاضرات ومتحدثين ومواضيع تلهمك",
+    searchPopularSubtitle: "ما يستمع إليه المجتمع",
+    searchResultsFor: "عرض النتائج لـ",
+    searchBrowseByTopicSubtitle: "اعثر على محتوى يلامس قلبك",
+
     // Auth
     signIn: "تسجيل الدخول",
     signUp: "إنشاء حساب",
@@ -258,6 +321,13 @@ export const translations = {
     phone: "الهاتف",
     phonePlaceholder: "+966501234567",
 
+    // Courses list
+    coursesTitle: "الدورات",
+    coursesSubtitle: "مسارات تعلم منظمة لتعميق معرفتك الإسلامية",
+    coursesAll: "الكل",
+    coursesProgress: "التقدم",
+    coursesLoadMore: "تحميل المزيد من الدورات",
+
     // Course detail
     backToCourses: "العودة إلى الدورات",
     courseLessons: "دروس",
@@ -267,6 +337,23 @@ export const translations = {
     continueCourse: "متابعة",
     preview: "معاينة",
     markComplete: "تحديد كمكتمل",
+
+    // Library
+    libraryTitle: "مكتبتك",
+    librarySubtitle: "المحتوى المحفوظ والمشغّل مؤخرًا وقوائم التشغيل في مكان واحد.",
+    libraryYourCollection: "مجموعتك",
+    librarySaved: "محفوظ",
+    libraryRecentlyPlayed: "شُغّل مؤخرًا",
+    libraryPlaylistsTab: "قوائم التشغيل",
+    libraryYourPlaylists: "قوائم التشغيل الخاصة بك",
+    libraryOrganizePlaylists: "نظّم المحاضرات المفضلة",
+    libraryCreatePlaylist: "إنشاء قائمة تشغيل",
+    libraryNoSavedContent: "لا يوجد محتوى محفوظ بعد. ابدأ بحفظ المحاضرات المفضلة!",
+    libraryNoRecentlyPlayed: "لا يوجد محتوى شُغّل مؤخرًا بعد.",
+    libraryNoPlaylists: "لا توجد قوائم تشغيل بعد. أنشئ أول قائمة!",
+    libraryCreatePlaylistTitle: "إنشاء قائمة تشغيل جديدة",
+    libraryCreatePlaylistDescription: "أعطِ قائمتك اسمًا ووصفًا اختياريًا.",
+    libraryLectures: "محاضرات",
   },
 } as const;
 

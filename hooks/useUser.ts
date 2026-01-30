@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { AuthService, CreateUserReq, UserResponse, UserStats } from "@/services/auth.service";
+import { AuthService, CreateUserReq, UserResponse, UserStats, UpdateProfileReq, ChangePasswordDto } from "@/services/auth.service";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 
@@ -96,5 +96,45 @@ export function useUserStats(enabled: boolean = true) {
     },
     enabled,
     retry: false,
+  });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: UpdateProfileReq) => AuthService.updateProfile(data),
+    onSuccess: (data) => {
+      qc.setQueryData(USER_KEYS.detail("me"), data);
+      toast.success("Profile updated successfully");
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to update profile");
+    },
+  });
+}
+
+export function useUploadProfileImage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => AuthService.uploadProfileImage(file),
+    onSuccess: (data) => {
+      qc.setQueryData(USER_KEYS.detail("me"), data);
+      toast.success("Profile image updated");
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to upload profile image");
+    },
+  });
+}
+
+export function useChangePassword() {
+  return useMutation({
+    mutationFn: (data: ChangePasswordDto) => AuthService.changePassword(data),
+    onSuccess: () => {
+      toast.success("Password changed successfully");
+    },
+    onError: (error: AxiosError<{ message?: string }>) => {
+      toast.error(error.response?.data?.message || "Failed to change password");
+    },
   });
 }

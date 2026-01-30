@@ -9,9 +9,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Filter, Loader2, Sparkles, BookOpen, Mic, Globe, SlidersHorizontal } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { Filter, Loader2, Sparkles, Mic, Globe, SlidersHorizontal } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import { useInfiniteContent, useCategories, useSpeakers } from "@/hooks/useContent";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
 import { useUser } from "@/hooks/useUser";
@@ -19,6 +20,9 @@ import { useI18n } from "@/stores/useI18nStore";
 import { getContentSlug } from "@/lib/utils";
 import LoginBanner from "@/components/common/LoginBanner";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
+
+const GRID_COLS = 6;
+const ROW_HEIGHT_ESTIMATE = 300;
 
 // Skeleton loader component
 const ContentCardSkeleton = () => (
@@ -34,6 +38,7 @@ const ContentCardSkeleton = () => (
 
 export default function Browse() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useI18n();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedSpeaker, setSelectedSpeaker] = useState<string>("all");
@@ -44,6 +49,30 @@ export default function Browse() {
 
   const { data: categories = [], isLoading: isLoadingCategories } = useCategories();
   const { data: speakers = [], isLoading: isLoadingSpeakers } = useSpeakers();
+
+  // Derive effective category from URL param (e.g. from home page category click) or user selection
+  const categoryParam = searchParams.get("category");
+  const resolvedCategoryId = useMemo(() => {
+    if (!categoryParam || categories.length === 0) return selectedCategory;
+    const match = categories.find(
+      (c) =>
+        c.slug === categoryParam ||
+        c.name === categoryParam ||
+        c.name.toLowerCase() === categoryParam.toLowerCase() ||
+        c.id === categoryParam
+    );
+    return match ? match.id : selectedCategory;
+  }, [categoryParam, categories, selectedCategory]);
+
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    if (value === "all") {
+      router.replace("/browse");
+    } else {
+      const cat = categories.find((c) => c.id === value);
+      router.replace(cat ? `/browse?category=${cat.slug}` : "/browse");
+    }
+  };
   const { data: user } = useUser();
   
   // Only fetch playlists if user is logged in
@@ -59,7 +88,7 @@ export default function Browse() {
 
   const filters = {
     limit: 10,
-    ...(selectedCategory !== "all" && { category: selectedCategory }),
+    ...(resolvedCategoryId !== "all" && { category: resolvedCategoryId }),
     ...(selectedSpeaker !== "all" && { speaker: selectedSpeaker }),
     ...(searchQuery.trim() && { search: searchQuery.trim() }),
   };
@@ -77,35 +106,42 @@ export default function Browse() {
   const content = data?.pages.flatMap((page) => page.data) ?? [];
   const totalItems = data?.pages[0]?.meta.total ?? 0;
 
-  // Intersection Observer for infinite scrolling
+  // Virtualized grid: scroll container ref and row count
+  const gridScrollRef = useRef<HTMLDivElement>(null);
+  const rowCount = Math.ceil(content.length / GRID_COLS);
+  const virtualizer = useVirtualizer({
+    count: rowCount,
+    getScrollElement: () => gridScrollRef.current,
+    estimateSize: () => ROW_HEIGHT_ESTIMATE,
+    overscan: 2,
+  });
+  const virtualRows = virtualizer.getVirtualItems();
+
+  // Intersection Observer for infinite scroll (trigger when sentinel is visible in grid scroll area)
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const scrollEl = gridScrollRef.current;
+    if (!scrollEl) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
-      { threshold: 0.1 }
+      { root: scrollEl, rootMargin: "200px", threshold: 0 }
     );
-
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
-    }
-
+    const sentinel = observerTarget.current;
+    if (sentinel) observer.observe(sentinel);
     return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
+      if (sentinel) observer.unobserve(sentinel);
     };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, content.length]);
 
   // Reset to first page when filters change
   useEffect(() => {
     // This will be handled by React Query's query key invalidation
-  }, [selectedCategory, selectedSpeaker, searchQuery]);
+  }, [resolvedCategoryId, selectedSpeaker, searchQuery]);
 
   return (
     <>
@@ -172,7 +208,7 @@ export default function Browse() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select value={resolvedCategoryId} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-full md:w-[200px] bg-background/50 border-border/50 hover:border-primary/50 transition-colors">
                   <SelectValue placeholder={t("category")} />
                 </SelectTrigger>
@@ -244,7 +280,7 @@ export default function Browse() {
 
           {/* Content Grid with staggered animation */}
           {isLoading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
               {[...Array(8)].map((_, i) => (
                 <ContentCardSkeleton key={i} />
               ))}
@@ -255,64 +291,102 @@ export default function Browse() {
             </div>
           ) : content.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                {content.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${0.1 * index}s` }}
-                  >
-                    <ContentCard
-                      title={item.title}
-                      speaker={item.speaker.name}
-                      duration={item.duration || "--:--"}
-                      image={item.speaker.image || undefined}
-                      onClick={() => router.push(`/content/${getContentSlug(item)}`)}
-                      contentId={item.id}
-                      onAddToPlaylist={isLoggedIn ? (playlistId) => {
-                        addContentToPlaylist({
-                          playlistId,
-                          contentId: item.id,
-                        });
-                      } : undefined}
-                      onCreatePlaylist={isLoggedIn ? (contentId) => {
-                        if (contentId) {
-                          setContentIdForPlaylist(contentId);
-                        }
-                        setIsCreateModalOpen(true);
-                      } : undefined}
-                      playlists={isLoggedIn ? playlists : undefined}
-                    />
-                  </div>
-                ))}
+              {/* Virtualized grid with its own scroll area */}
+              <div
+                ref={gridScrollRef}
+                className="overflow-auto rounded-lg border border-border/50"
+                style={{ height: "calc(100vh - 420px)", minHeight: 400 }}
+              >
+                <div
+                  style={{
+                    height: `${virtualizer.getTotalSize()}px`,
+                    position: "relative",
+                    width: "100%",
+                  }}
+                >
+                  {virtualRows.map((virtualRow: VirtualItem) => {
+                    const rowItems = content.slice(
+                      virtualRow.index * GRID_COLS,
+                      virtualRow.index * GRID_COLS + GRID_COLS
+                    );
+                    return (
+                      <div
+                        key={virtualRow.key}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          width: "100%",
+                          height: `${virtualRow.size}px`,
+                          transform: `translateY(${virtualRow.start}px)`,
+                        }}
+                      >
+                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 py-1 pr-2">
+                          {rowItems.map((item) => (
+                            <ContentCard
+                              key={item.id}
+                              title={item.title}
+                              speaker={item.speaker.name}
+                              duration={item.duration || "--:--"}
+                              image={item.speaker.image || undefined}
+                              onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                              contentId={item.id}
+                              onAddToPlaylist={
+                                isLoggedIn
+                                  ? (playlistId) => {
+                                      addContentToPlaylist({
+                                        playlistId,
+                                        contentId: item.id,
+                                      });
+                                    }
+                                  : undefined
+                              }
+                              onCreatePlaylist={
+                                isLoggedIn
+                                  ? (contentId) => {
+                                      if (contentId) setContentIdForPlaylist(contentId);
+                                      setIsCreateModalOpen(true);
+                                    }
+                                  : undefined
+                              }
+                              playlists={isLoggedIn ? playlists : undefined}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Infinite scroll sentinel – when visible, fetch next page */}
+                <div
+                  ref={observerTarget}
+                  className="h-20 flex items-center justify-center min-h-[80px] shrink-0"
+                >
+                  {isFetchingNextPage && (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <span>{t("loadingMore") || "Loading more..."}</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Infinite scroll trigger */}
-              <div ref={observerTarget} className="h-20 flex items-center justify-center">
-                {isFetchingNextPage && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    <span>{t("loadingMore") || "Loading more..."}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* End of results message */}
+              {/* End of results message (outside scroll area) */}
               {!hasNextPage && content.length > 0 && (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-center py-6 text-muted-foreground">
                   {t("noMoreContent") || "No more content to load"}
                 </div>
               )}
 
-              {/* Load More Section */}
-              {hasNextPage && (
-                <div className="flex justify-center mt-12 animate-fade-in" style={{ animationDelay: "0.8s" }}>
+              {/* Load More button (fallback) */}
+              {hasNextPage && !isFetchingNextPage && (
+                <div className="flex justify-center mt-6">
                   <Button
                     variant="outline"
                     size="lg"
                     className="group border-primary/50 hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                     onClick={() => fetchNextPage()}
-                    disabled={isFetchingNextPage}
                   >
                     <span>{t("loadingMore") || "Load More Content"}</span>
                     <Sparkles className="w-4 h-4 ml-2 group-hover:animate-pulse" />

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Filter, Loader2, Sparkles, Mic, Globe, SlidersHorizontal } from "lucide-react";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import { useInfiniteContent, useCategories, useSpeakers } from "@/hooks/useContent";
@@ -36,7 +36,36 @@ const ContentCardSkeleton = () => (
   </div>
 );
 
-export default function Browse() {
+function BrowseFallback() {
+  return (
+    <div className="min-h-screen">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/20 via-background to-accent/10 py-12 mb-8 animate-pulse">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center">
+            <div className="h-6 w-32 bg-muted rounded-full mx-auto mb-4" />
+            <div className="h-10 w-64 bg-muted rounded mx-auto mb-4" />
+            <div className="h-5 w-96 bg-muted/80 rounded mx-auto" />
+          </div>
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-10 w-24 bg-muted rounded-full" />
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 pb-8">
+        <div className="h-32 bg-card/50 rounded-2xl mb-8 animate-pulse" />
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+          {[...Array(12)].map((_, i) => (
+            <ContentCardSkeleton key={i} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BrowseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useI18n();
@@ -411,5 +440,13 @@ export default function Browse() {
         contentId={contentIdForPlaylist}
       />
     </>
+  );
+}
+
+export default function Browse() {
+  return (
+    <Suspense fallback={<BrowseFallback />}>
+      <BrowseContent />
+    </Suspense>
   );
 }

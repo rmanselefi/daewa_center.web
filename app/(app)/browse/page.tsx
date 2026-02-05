@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Filter, Loader2, Sparkles, Mic, Globe, SlidersHorizontal } from "lucide-react";
 import { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 import { useInfiniteContent, useCategories, useSpeakers } from "@/hooks/useContent";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
 import { useUser } from "@/hooks/useUser";
@@ -20,9 +19,6 @@ import { useI18n } from "@/stores/useI18nStore";
 import { getContentSlug } from "@/lib/utils";
 import LoginBanner from "@/components/common/LoginBanner";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
-
-const GRID_COLS = 6;
-const ROW_HEIGHT_ESTIMATE = 300;
 
 // Skeleton loader component
 const ContentCardSkeleton = () => (
@@ -135,30 +131,17 @@ function BrowseContent() {
   const content = data?.pages.flatMap((page) => page.data) ?? [];
   const totalItems = data?.pages[0]?.meta.total ?? 0;
 
-  // Virtualized grid: scroll container ref and row count
-  const gridScrollRef = useRef<HTMLDivElement>(null);
-  const rowCount = Math.ceil(content.length / GRID_COLS);
-  const virtualizer = useVirtualizer({
-    count: rowCount,
-    getScrollElement: () => gridScrollRef.current,
-    estimateSize: () => ROW_HEIGHT_ESTIMATE,
-    overscan: 2,
-  });
-  const virtualRows = virtualizer.getVirtualItems();
-
-  // Intersection Observer for infinite scroll (trigger when sentinel is visible in grid scroll area)
+  // Intersection Observer for infinite scroll (viewport = main page scroll)
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const scrollEl = gridScrollRef.current;
-    if (!scrollEl) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       },
-      { root: scrollEl, rootMargin: "200px", threshold: 0 }
+      { root: null, rootMargin: "200px", threshold: 0 }
     );
     const sentinel = observerTarget.current;
     if (sentinel) observer.observe(sentinel);
@@ -320,88 +303,54 @@ function BrowseContent() {
             </div>
           ) : content.length > 0 ? (
             <>
-              {/* Virtualized grid with its own scroll area */}
-              <div
-                ref={gridScrollRef}
-                className="overflow-auto rounded-lg border border-border/50"
-                style={{ height: "calc(100vh - 420px)", minHeight: 400 }}
-              >
-                <div
-                  style={{
-                    height: `${virtualizer.getTotalSize()}px`,
-                    position: "relative",
-                    width: "100%",
-                  }}
-                >
-                  {virtualRows.map((virtualRow: VirtualItem) => {
-                    const rowItems = content.slice(
-                      virtualRow.index * GRID_COLS,
-                      virtualRow.index * GRID_COLS + GRID_COLS
-                    );
-                    return (
-                      <div
-                        key={virtualRow.key}
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          width: "100%",
-                          height: `${virtualRow.size}px`,
-                          transform: `translateY(${virtualRow.start}px)`,
-                        }}
-                      >
-                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4 py-1 pr-2">
-                          {rowItems.map((item) => (
-                            <ContentCard
-                              key={item.id}
-                              title={item.title}
-                              speaker={item.speaker.name}
-                              duration={item.duration || "--:--"}
-                              image={item.speaker.image || undefined}
-                              onClick={() => router.push(`/content/${getContentSlug(item)}`)}
-                              contentId={item.id}
-                              onAddToPlaylist={
-                                isLoggedIn
-                                  ? (playlistId) => {
-                                      addContentToPlaylist({
-                                        playlistId,
-                                        contentId: item.id,
-                                      });
-                                    }
-                                  : undefined
-                              }
-                              onCreatePlaylist={
-                                isLoggedIn
-                                  ? (contentId) => {
-                                      if (contentId) setContentIdForPlaylist(contentId);
-                                      setIsCreateModalOpen(true);
-                                    }
-                                  : undefined
-                              }
-                              playlists={isLoggedIn ? playlists : undefined}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Infinite scroll sentinel – when visible, fetch next page */}
-                <div
-                  ref={observerTarget}
-                  className="h-20 flex items-center justify-center min-h-[80px] shrink-0"
-                >
-                  {isFetchingNextPage && (
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                      <span>{t("loadingMore") || "Loading more..."}</span>
-                    </div>
-                  )}
-                </div>
+              {/* Content grid – scrolls with main page */}
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+                {content.map((item) => (
+                  <ContentCard
+                    key={item.id}
+                    title={item.title}
+                    speaker={item.speaker.name}
+                    duration={item.duration || "--:--"}
+                    image={item.speaker.image || undefined}
+                    onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                    contentId={item.id}
+                    onAddToPlaylist={
+                      isLoggedIn
+                        ? (playlistId) => {
+                            addContentToPlaylist({
+                              playlistId,
+                              contentId: item.id,
+                            });
+                          }
+                        : undefined
+                    }
+                    onCreatePlaylist={
+                      isLoggedIn
+                        ? (contentId) => {
+                            if (contentId) setContentIdForPlaylist(contentId);
+                            setIsCreateModalOpen(true);
+                          }
+                        : undefined
+                    }
+                    playlists={isLoggedIn ? playlists : undefined}
+                  />
+                ))}
               </div>
 
-              {/* End of results message (outside scroll area) */}
+              {/* Infinite scroll sentinel – when visible, fetch next page */}
+              <div
+                ref={observerTarget}
+                className="h-20 flex items-center justify-center min-h-[80px] shrink-0"
+              >
+                {isFetchingNextPage && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>{t("loadingMore") || "Loading more..."}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* End of results message */}
               {!hasNextPage && content.length > 0 && (
                 <div className="text-center py-6 text-muted-foreground">
                   {t("noMoreContent") || "No more content to load"}

@@ -7,7 +7,7 @@ import { ArrowLeft, List } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { usePlaylist } from "@/hooks/usePlaylist";
 import { parsePlaylistIdFromSlug } from "@/lib/utils";
-import { getContentSlug } from "@/lib/utils";
+import { getContentPath } from "@/lib/utils";
 
 interface PlaylistDetailProps {
   params: Promise<{ slug: string }>;
@@ -81,7 +81,7 @@ export default function PlaylistDetail({ params }: PlaylistDetailProps) {
               speaker={item.speaker?.name ?? ""}
               duration={item.duration ?? "--:--"}
               image={item.speaker?.image}
-              onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+              onClick={() => router.push(`/content/${getContentPath(item)}`)}
             />
           ))}
         </div>

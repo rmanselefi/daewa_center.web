@@ -20,7 +20,7 @@ import { useUser } from "@/hooks/useUser";
 import { usePlaylists, useCreatePlaylist, useAddContentToPlaylist } from "@/hooks/usePlaylist";
 import { useLibraryContent } from "@/hooks/useLibrary";
 import { useRecentlyPlayed } from "@/hooks/usePlayHistory";
-import { getContentSlug, getPlaylistSlug } from "@/lib/utils";
+import { getContentPath, getPlaylistSlug } from "@/lib/utils";
 import { useI18n } from "@/stores/useI18nStore";
 
 export default function Library() {
@@ -158,7 +158,7 @@ export default function Library() {
                       speaker={item.speaker.name}
                       duration={item.duration || "--:--"}
                       image={item.speaker.image || undefined}
-                      onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                      onClick={() => router.push(`/content/${getContentPath(item)}`)}
                       contentId={item.id}
                       onAddToPlaylist={(playlistId) => {
                         addContentToPlaylist({ playlistId, contentId: item.id });
@@ -194,7 +194,7 @@ export default function Library() {
                       speaker={item.speaker.name}
                       duration={item.duration || "--:--"}
                       image={item.speaker.image || undefined}
-                      onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                      onClick={() => router.push(`/content/${getContentPath(item)}`)}
                       contentId={item.id}
                       onAddToPlaylist={(playlistId) => {
                         addContentToPlaylist({ playlistId, contentId: item.id });

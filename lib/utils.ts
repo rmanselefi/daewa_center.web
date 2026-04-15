@@ -32,6 +32,19 @@ export function getContentSlug(content: { slug?: string; title: string }): strin
   return content.slug || createSlug(content.title);
 }
 
+/** URL segment for /content/[slug] — always includes id so non-Latin titles never produce an empty path (404 on /content). */
+export function getContentPath(content: { id: string; slug?: string; title: string }): string {
+  const base = getContentSlug(content);
+  return base ? `${base}-${content.id}` : content.id;
+}
+
+/** UUID at end of content URL (same pattern as course / playlist). */
+export function parseContentIdFromSlug(slug: string): string | null {
+  const uuidPattern = /([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+  const match = slug.match(uuidPattern);
+  return match ? match[1] : null;
+}
+
 // Get slug from course item (generate from title)
 export function getCourseSlug(course: { title: string }): string {
   return createSlug(course.title);

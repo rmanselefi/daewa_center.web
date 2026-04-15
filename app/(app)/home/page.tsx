@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import LoginBanner from "@/components/common/LoginBanner";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import { useFeaturedContent, useCategoryPreview, useTrendingContent } from "@/hooks/useContent";
-import { getContentSlug } from "@/lib/utils";
+import { getContentPath } from "@/lib/utils";
 import { useI18n } from "@/stores/useI18nStore";
 import { useUser } from "@/hooks/useUser";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
@@ -207,7 +207,7 @@ export default function Home() {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                onClick={() => router.push(`/content/${getContentPath(item)}`)}
                 contentId={item.id}
                 onAddToPlaylist={isLoggedIn ? (playlistId) => {
                   addContentToPlaylist({
@@ -259,7 +259,7 @@ export default function Home() {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                onClick={() => router.push(`/content/${getContentPath(item)}`)}
                 contentId={item.id}
                 onAddToPlaylist={isLoggedIn ? (playlistId) => {
                   addContentToPlaylist({

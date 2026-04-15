@@ -9,7 +9,7 @@ import { useI18n } from "@/stores/useI18nStore";
 import { useSearch, useRecentSearches, usePopularContent, useCategoryPreview } from "@/hooks/useContent";
 import { usePlaylists, useAddContentToPlaylist } from "@/hooks/usePlaylist";
 import { useUser } from "@/hooks/useUser";
-import { getContentSlug } from "@/lib/utils";
+import { getContentPath } from "@/lib/utils";
 import { CreatePlaylistModal } from "@/components/common/CreatePlaylistModal";
 import LoginBanner from "@/components/common/LoginBanner";
 
@@ -174,7 +174,7 @@ export default function Search() {
                         speaker={item.speaker.name}
                         duration={item.duration || "--:--"}
                         image={item.speaker.image || undefined}
-                        onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                        onClick={() => router.push(`/content/${getContentPath(item)}`)}
                         contentId={item.id}
                         onAddToPlaylist={
                           isLoggedIn
@@ -216,7 +216,7 @@ export default function Search() {
                       speaker={item.speaker.name}
                       duration={item.duration || "--:--"}
                       image={item.speaker.image || undefined}
-                      onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                      onClick={() => router.push(`/content/${getContentPath(item)}`)}
                       contentId={item.id}
                       onAddToPlaylist={
                         isLoggedIn

@@ -211,7 +211,7 @@ export function useContentById(id: string) {
   });
 }
 
-export function useContentBySlug(slug: string) {
+export function useContentBySlug(slug: string, enabled: boolean = true) {
   return useQuery<ContentItem>({
     queryKey: [...CONTENT_KEYS.all, "bySlug", slug],
     queryFn: async () => {
@@ -223,7 +223,7 @@ export function useContentBySlug(slug: string) {
         throw error;
       }
     },
-    enabled: !!slug,
+    enabled: !!slug && enabled,
     retry: false,
   });
 }

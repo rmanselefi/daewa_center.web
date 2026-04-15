@@ -7,9 +7,9 @@ import { Card } from "@/components/ui/card";
 import { Play, Pause, Plus, Share2, Clock, Calendar, Check } from "lucide-react";
 import { ContentCard } from "@/app/features/home/ContentCard";
 import { useI18n } from "@/stores/useI18nStore";
-import { useContentBySlug, useContent } from "@/hooks/useContent";
+import { useContentBySlug, useContent, useContentById } from "@/hooks/useContent";
 import { useAudioPlayerStore } from "@/stores/useAudioPlayerStore";
-import { getContentSlug } from "@/lib/utils";
+import { getContentPath, parseContentIdFromSlug } from "@/lib/utils";
 import { useCheckLibraryStatus, useAddToLibrary, useRemoveFromLibrary } from "@/hooks/useLibrary";
 import { useUser } from "@/hooks/useUser";
 import { useMemo } from "react";
@@ -25,8 +25,14 @@ export default function ContentDetail({ params }: ContentDetailProps) {
   const router = useRouter();
   const { t } = useI18n();
   const { data: user } = useUser();
-  // Fetch content by slug from URL
-  const { data: content, isLoading } = useContentBySlug(slug);
+  const contentIdFromUrl = useMemo(() => parseContentIdFromSlug(slug), [slug]);
+  const { data: contentById, isLoading: isLoadingById } = useContentById(contentIdFromUrl ?? "");
+  const { data: contentBySlug, isLoading: isLoadingBySlug } = useContentBySlug(
+    contentIdFromUrl ? "" : slug,
+    !contentIdFromUrl
+  );
+  const content = contentIdFromUrl ? contentById : contentBySlug;
+  const isLoading = contentIdFromUrl ? isLoadingById : isLoadingBySlug;
   
   // Fetch related content (same category, excluding current content)
   const { data: relatedContentResponse, isLoading: isLoadingRelated } = useContent(
@@ -271,7 +277,7 @@ export default function ContentDetail({ params }: ContentDetailProps) {
                 speaker={item.speaker.name}
                 duration={item.duration || "--:--"}
                 image={item.speaker.image || undefined}
-                onClick={() => router.push(`/content/${getContentSlug(item)}`)}
+                onClick={() => router.push(`/content/${getContentPath(item)}`)}
               />
             ))}
           </div>

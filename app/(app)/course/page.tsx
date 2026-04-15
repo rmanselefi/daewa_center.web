@@ -58,11 +58,6 @@ export default function Courses() {
   const coursesToShow = filteredCourses.slice(0, displayCount);
   const hasMore = displayCount < filteredCourses.length;
 
-  // Reset display count when filter changes
-  useEffect(() => {
-    setDisplayCount(COURSES_PER_PAGE);
-  }, [activeCategory]);
-
   if (isLoading) return null;
   if (!user) return null;
 
@@ -118,7 +113,10 @@ export default function Courses() {
                 <button
                   key={cat.key}
                   type="button"
-                  onClick={() => setActiveCategory(cat.key)}
+                  onClick={() => {
+                    setActiveCategory(cat.key);
+                    setDisplayCount(COURSES_PER_PAGE);
+                  }}
                   className={`
                     flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300
                     ${

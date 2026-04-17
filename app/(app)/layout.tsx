@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/common/Sidebar";
 import { MobileMenu } from "@/components/common/MobileMenu";
 import { useIsMobile } from "@/hooks/useMobile";
 import { CourseProgressProvider } from "@/contexts/CourseProgressContext";
+import { AIAssistantWidget } from "@/components/common/AIAssistantWidget";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const isMobile = useIsMobile();
@@ -26,6 +27,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </main>
         </div>
 
+        <AIAssistantWidget />
         <PlayerBar />
       </div>
     </CourseProgressProvider>
